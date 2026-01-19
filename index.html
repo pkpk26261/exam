@@ -2072,6 +2072,133 @@
             background: rgba(0, 0, 0, 0.3);
         }
 
+        /* 觸控輸入模式 - 當鍵盤彈出時 */
+        .touch-input-mode .main-container {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .touch-input-mode .carousel-container {
+            overflow: visible;
+        }
+
+        .touch-input-active {
+            position: fixed !important;
+            top: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            z-index: 9999 !important;
+            background: #1a1a2e !important;
+            -webkit-border-radius: 10px !important;
+            -moz-border-radius: 10px !important;
+            border-radius: 10px !important;
+            padding: 15px !important;
+            -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5) !important;
+            -moz-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5) !important;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5) !important;
+            max-height: 35vh !important;
+        }
+
+        .touch-input-active:focus {
+            outline: 2px solid #00d9ff !important;
+        }
+
+        /* 科目輸入框的觸控模式（單行） */
+        .subject-input.touch-input-active {
+            max-height: 60px !important;
+            height: auto !important;
+            padding: 15px 20px !important;
+            font-size: 1.3rem !important;
+        }
+
+        .light-mode .touch-input-active {
+            background: #fff !important;
+            -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
+            -moz-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* 觸控輸入模式的標題列 */
+        .touch-input-header {
+            display: none;
+            -webkit-box-pack: justify;
+            -webkit-justify-content: space-between;
+            -moz-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .touch-input-header.active {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .touch-input-header .title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #e94560;
+        }
+
+        .touch-input-header .close-btn {
+            background: rgba(244, 67, 54, 0.8);
+            border: none;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+
+        .touch-input-header .close-btn:hover {
+            background: #f44336;
+        }
+
+        .light-mode .touch-input-header {
+            border-bottom-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .touch-input-header .title {
+            color: #c53050;
+        }
+
+        /* 過渡動畫 */
+        .remarks-input,
+        .rules-textarea {
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
     </style>
 </head>
 <body>
@@ -2895,6 +3022,138 @@
 
         // 初始化縮放設定
         loadZoomSettings();
+
+        // ===== 觸控螢幕鍵盤處理 =====
+        // 偵測是否為觸控設備
+        function isTouchDevice() {
+            return ('ontouchstart' in window) || 
+                   (navigator.maxTouchPoints > 0) || 
+                   (navigator.msMaxTouchPoints > 0);
+        }
+
+        // 儲存原始位置資訊
+        let originalPosition = null;
+        let activeInput = null;
+
+        // 啟用觸控輸入模式
+        function enableTouchInputMode(inputElement, title) {
+            if (!isTouchDevice()) return;
+            
+            // 如果已經有活動的輸入框，先關閉
+            if (activeInput && activeInput !== inputElement) {
+                disableTouchInputMode();
+            }
+
+            activeInput = inputElement;
+            document.body.classList.add('touch-input-mode');
+            inputElement.classList.add('touch-input-active');
+
+            // 暫停輪播
+            clearInterval(carouselInterval);
+            var progressEl = document.getElementById('carouselProgress');
+            if (progressEl) {
+                progressEl.style.animationPlayState = 'paused';
+            }
+
+            // 根據輸入框類型設定高度
+            if (inputElement.classList.contains('subject-input')) {
+                // 科目輸入框是單行，不需要很高
+                inputElement.style.height = 'auto';
+                inputElement.style.minHeight = '50px';
+            } else {
+                // 備註和規則是多行文字區域
+                inputElement.style.height = '30vh';
+                inputElement.style.minHeight = '120px';
+            }
+        }
+
+        // 停用觸控輸入模式
+        function disableTouchInputMode() {
+            if (!activeInput) return;
+
+            activeInput.classList.remove('touch-input-active');
+            activeInput.style.height = '';
+            activeInput.style.minHeight = '';
+            
+            document.body.classList.remove('touch-input-mode');
+            activeInput = null;
+
+            // 恢復輪播
+            startCarouselTimer();
+            document.getElementById('carouselProgress').style.animationPlayState = 'running';
+        }
+
+        // 綁定備註輸入框事件
+        const remarksInput = document.getElementById('remarks');
+        if (remarksInput) {
+            remarksInput.addEventListener('focus', function() {
+                enableTouchInputMode(this, '備註事項');
+            });
+            remarksInput.addEventListener('blur', function() {
+                // 延遲執行以避免點擊其他元素時立即關閉
+                setTimeout(function() {
+                    if (activeInput === remarksInput) {
+                        disableTouchInputMode();
+                    }
+                }, 200);
+            });
+        }
+
+        // 綁定考試規則輸入框事件
+        const rulesTextareaEl = document.getElementById('rulesTextarea');
+        if (rulesTextareaEl) {
+            rulesTextareaEl.addEventListener('focus', function() {
+                enableTouchInputMode(this, '考試規則');
+            });
+            rulesTextareaEl.addEventListener('blur', function() {
+                setTimeout(function() {
+                    if (activeInput === rulesTextareaEl) {
+                        disableTouchInputMode();
+                        saveRulesEdit();
+                    }
+                }, 200);
+            });
+        }
+
+        // 綁定考試科目輸入框事件
+        function bindSubjectInputEvents() {
+            const subjectInputs = document.querySelectorAll('.subject-input');
+            subjectInputs.forEach(function(input) {
+                // 避免重複綁定
+                if (input.dataset.touchBound) return;
+                input.dataset.touchBound = 'true';
+                
+                input.addEventListener('focus', function() {
+                    enableTouchInputMode(this, '考試科目');
+                });
+                input.addEventListener('blur', function() {
+                    const self = this;
+                    setTimeout(function() {
+                        if (activeInput === self) {
+                            disableTouchInputMode();
+                            // 更新科目顯示
+                            const periodId = self.id.replace('subject-', '');
+                            updateSubjectDisplay(parseInt(periodId));
+                        }
+                    }, 200);
+                });
+            });
+        }
+
+        // 初始化科目輸入框事件
+        bindSubjectInputEvents();
+
+        // 使用 visualViewport API 來偵測鍵盤彈出（如果可用）
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', function() {
+                if (activeInput) {
+                    // 計算可用高度
+                    const availableHeight = window.visualViewport.height;
+                    const maxInputHeight = Math.min(availableHeight * 0.4, 250);
+                    activeInput.style.maxHeight = maxInputHeight + 'px';
+                }
+            });
+        }
     </script>
 </body>
 </html>
