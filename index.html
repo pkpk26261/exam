@@ -785,6 +785,35 @@
             color: #00d9ff;
             margin-top: 6px;
             margin-top: calc(var(--spacing-unit) * 0.5);
+            min-height: 2.2em;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            line-height: 1.2;
+        }
+
+        .current-exam-info.multiline {
+            font-size: 1rem;
+            font-size: calc(var(--countdown-info-size) * 0.7);
         }
 
         /* 人數統計區 */
@@ -1374,6 +1403,90 @@
 
         .control-buttons > *:last-child {
             margin-right: 0;
+        }
+
+        /* 時間誤差調整控制 */
+        .time-adjust-controls {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            padding: 6px 12px;
+        }
+
+        .time-adjust-label {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        .time-adjust-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 4px 8px;
+            margin: 0 2px;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            -webkit-transition: all 0.2s ease;
+            -moz-transition: all 0.2s ease;
+            -o-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+        }
+
+        .time-adjust-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .time-adjust-btn.reset {
+            background: rgba(233, 69, 96, 0.3);
+            border-color: rgba(233, 69, 96, 0.5);
+            margin-left: 8px;
+        }
+
+        .time-adjust-btn.reset:hover {
+            background: rgba(233, 69, 96, 0.5);
+        }
+
+        .time-offset-display {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            padding: 4px 12px;
+            margin: 0 6px;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        .time-offset-display.positive {
+            color: #4caf50;
+        }
+
+        .time-offset-display.negative {
+            color: #ff9800;
+        }
+
+        .time-offset-display.zero {
+            color: #aaa;
         }
 
         .btn {
@@ -2373,6 +2486,136 @@
             background: rgba(197, 48, 80, 0.95);
         }
 
+        /* 考試結束提醒視窗 */
+        .exam-end-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+
+        .exam-end-overlay.active {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .exam-end-content {
+            text-align: center;
+            padding: 60px 80px;
+            background: linear-gradient(135deg, #c53050 0%, #e94560 50%, #ff6b7a 100%);
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            border-radius: 20px;
+            -webkit-box-shadow: 0 0 60px rgba(233, 69, 96, 0.8), 0 0 100px rgba(233, 69, 96, 0.4);
+            -moz-box-shadow: 0 0 60px rgba(233, 69, 96, 0.8), 0 0 100px rgba(233, 69, 96, 0.4);
+            box-shadow: 0 0 60px rgba(233, 69, 96, 0.8), 0 0 100px rgba(233, 69, 96, 0.4);
+            -webkit-animation: pulseGlow 1s ease-in-out infinite;
+            -moz-animation: pulseGlow 1s ease-in-out infinite;
+            -o-animation: pulseGlow 1s ease-in-out infinite;
+            animation: pulseGlow 1s ease-in-out infinite;
+        }
+
+        @-webkit-keyframes pulseGlow {
+            0%, 100% { -webkit-transform: scale(1); transform: scale(1); }
+            50% { -webkit-transform: scale(1.02); transform: scale(1.02); }
+        }
+
+        @-moz-keyframes pulseGlow {
+            0%, 100% { -moz-transform: scale(1); transform: scale(1); }
+            50% { -moz-transform: scale(1.02); transform: scale(1.02); }
+        }
+
+        @-o-keyframes pulseGlow {
+            0%, 100% { -o-transform: scale(1); transform: scale(1); }
+            50% { -o-transform: scale(1.02); transform: scale(1.02); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { -webkit-transform: scale(1); -moz-transform: scale(1); -o-transform: scale(1); transform: scale(1); }
+            50% { -webkit-transform: scale(1.02); -moz-transform: scale(1.02); -o-transform: scale(1.02); transform: scale(1.02); }
+        }
+
+        .exam-end-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            -webkit-animation: shake 0.5s ease-in-out infinite;
+            -moz-animation: shake 0.5s ease-in-out infinite;
+            -o-animation: shake 0.5s ease-in-out infinite;
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        @-webkit-keyframes shake {
+            0%, 100% { -webkit-transform: rotate(-5deg); transform: rotate(-5deg); }
+            50% { -webkit-transform: rotate(5deg); transform: rotate(5deg); }
+        }
+
+        @-moz-keyframes shake {
+            0%, 100% { -moz-transform: rotate(-5deg); transform: rotate(-5deg); }
+            50% { -moz-transform: rotate(5deg); transform: rotate(5deg); }
+        }
+
+        @-o-keyframes shake {
+            0%, 100% { -o-transform: rotate(-5deg); transform: rotate(-5deg); }
+            50% { -o-transform: rotate(5deg); transform: rotate(5deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { -webkit-transform: rotate(-5deg); -moz-transform: rotate(-5deg); -o-transform: rotate(-5deg); transform: rotate(-5deg); }
+            50% { -webkit-transform: rotate(5deg); -moz-transform: rotate(5deg); -o-transform: rotate(5deg); transform: rotate(5deg); }
+        }
+
+        .exam-end-title {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            letter-spacing: 0.2em;
+        }
+
+        .exam-end-subtitle {
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .exam-end-timer {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 20px;
+        }
+
+        .exam-end-timer span {
+            font-weight: bold;
+            font-size: 2rem;
+            color: #fff;
+        }
+
     </style>
 </head>
 <body>
@@ -2417,12 +2660,12 @@
             <!-- 倒數計時區 -->
             <div class="countdown-section">
                 <div class="countdown-box next-exam">
-                    <h3>📍 距離下一節考試</h3>
+                    <h3 id="nextExamTitle">📍 距離下一節考試</h3>
                     <div class="countdown-value" id="nextExamCountdown">--:--:--</div>
                     <div class="current-exam-info" id="nextExamInfo">尚未設定考試時間</div>
                 </div>
                 <div class="countdown-box remaining">
-                    <h3>⏱️ 本節剩餘時間</h3>
+                    <h3 id="remainingTitle">⏱️ 本節剩餘時間</h3>
                     <div class="countdown-value" id="remainingTime">--:--:--</div>
                     <div class="current-exam-info" id="currentExamInfo">目前無進行中的考試</div>
                 </div>
@@ -2515,6 +2758,17 @@
             <button class="btn btn-warning" onclick="loadData()">📂 載入資料</button>
             <button class="btn btn-danger" onclick="clearData()">🗑️ 清除資料</button>
         </div>
+        <div class="time-adjust-controls">
+            <span class="time-adjust-label">⏰ 時間誤差調整：</span>
+            <button class="time-adjust-btn" onclick="adjustTimeOffset(-60)" title="減少 1 分鐘">-1分</button>
+            <button class="time-adjust-btn" onclick="adjustTimeOffset(-10)" title="減少 10 秒">-10秒</button>
+            <button class="time-adjust-btn" onclick="adjustTimeOffset(-1)" title="減少 1 秒">-1秒</button>
+            <span class="time-offset-display" id="timeOffsetDisplay">0 秒</span>
+            <button class="time-adjust-btn" onclick="adjustTimeOffset(1)" title="增加 1 秒">+1秒</button>
+            <button class="time-adjust-btn" onclick="adjustTimeOffset(10)" title="增加 10 秒">+10秒</button>
+            <button class="time-adjust-btn" onclick="adjustTimeOffset(60)" title="增加 1 分鐘">+1分</button>
+            <button class="time-adjust-btn reset" onclick="resetTimeOffset()" title="重置為 0">重置</button>
+        </div>
         <div class="status-indicator">
             <span class="status-dot"></span>
             <span>系統運行中</span>
@@ -2522,6 +2776,16 @@
     </footer>
 
     <!-- 浮動輸入區域遮罩 -->
+    <!-- 考試結束提醒視窗 -->
+    <div class="exam-end-overlay" id="examEndOverlay">
+        <div class="exam-end-content">
+            <div class="exam-end-icon">🔔</div>
+            <div class="exam-end-title">考試結束</div>
+            <div class="exam-end-subtitle">請考生停筆</div>
+            <div class="exam-end-timer">此提示將在 <span id="examEndCountdown">10</span> 秒後自動關閉</div>
+        </div>
+    </div>
+
     <div class="input-overlay" id="inputOverlay" onclick="closeFloatingInput()"></div>
     
     <!-- 浮動輸入區域 -->
@@ -2545,8 +2809,99 @@
     </div>
 
     <script>
+        // ===== Polyfill for String.prototype.padStart =====
+        if (!String.prototype.padStart) {
+            String.prototype.padStart = function padStart(targetLength, padString) {
+                targetLength = targetLength >> 0;
+                padString = String(typeof padString !== 'undefined' ? padString : ' ');
+                if (this.length >= targetLength) {
+                    return String(this);
+                }
+                targetLength = targetLength - this.length;
+                if (targetLength > padString.length) {
+                    padString += padString.repeat(targetLength / padString.length);
+                }
+                return padString.slice(0, targetLength) + String(this);
+            };
+        }
+
+        // ===== Polyfill for String.prototype.repeat =====
+        if (!String.prototype.repeat) {
+            String.prototype.repeat = function(count) {
+                if (this == null) throw new TypeError('can\'t convert ' + this + ' to object');
+                var str = '' + this;
+                count = +count;
+                if (count < 0) throw new RangeError('repeat count must be non-negative');
+                if (count == Infinity) throw new RangeError('repeat count must be less than infinity');
+                count = Math.floor(count);
+                if (str.length == 0 || count == 0) return '';
+                var rpt = '';
+                for (var i = 0; i < count; i++) {
+                    rpt += str;
+                }
+                return rpt;
+            };
+        }
+
+        // ===== Polyfill for Array.prototype.some =====
+        if (!Array.prototype.some) {
+            Array.prototype.some = function(fun) {
+                if (this == null) throw new TypeError('Array.prototype.some called on null or undefined');
+                if (typeof fun !== 'function') throw new TypeError();
+                var t = Object(this);
+                var len = t.length >>> 0;
+                var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+                for (var i = 0; i < len; i++) {
+                    if (i in t && fun.call(thisArg, t[i], i, t)) return true;
+                }
+                return false;
+            };
+        }
+
+        // ===== Polyfill for String.prototype.includes =====
+        if (!String.prototype.includes) {
+            String.prototype.includes = function(search, start) {
+                if (typeof start !== 'number') start = 0;
+                if (start + search.length > this.length) return false;
+                return this.indexOf(search, start) !== -1;
+            };
+        }
+
+        // ===== Polyfill for Array.prototype.find =====
+        if (!Array.prototype.find) {
+            Array.prototype.find = function(predicate) {
+                if (this == null) throw new TypeError('Array.prototype.find called on null or undefined');
+                if (typeof predicate !== 'function') throw new TypeError('predicate must be a function');
+                var list = Object(this);
+                var length = list.length >>> 0;
+                var thisArg = arguments[1];
+                for (var i = 0; i < length; i++) {
+                    var value = list[i];
+                    if (predicate.call(thisArg, value, i, list)) return value;
+                }
+                return undefined;
+            };
+        }
+
+        // ===== Polyfill for Element.prototype.closest =====
+        if (!Element.prototype.closest) {
+            Element.prototype.closest = function(s) {
+                var el = this;
+                do {
+                    if (el.matches(s)) return el;
+                    el = el.parentElement || el.parentNode;
+                } while (el !== null && el.nodeType === 1);
+                return null;
+            };
+        }
+
+        // ===== Polyfill for Element.prototype.matches =====
+        if (!Element.prototype.matches) {
+            Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
+        }
+
         // 節次資料（含預設考試時間）
-        const periods = [
+        var periods = [
             { id: 1, label: '第一節', defaultStart: '08:15', defaultEnd: '09:00' },
             { id: 2, label: '第二節', defaultStart: '09:15', defaultEnd: '10:00' },
             { id: 3, label: '第三節', defaultStart: '10:15', defaultEnd: '11:00' },
@@ -2558,39 +2913,42 @@
 
         // 初始化節次列表
         function initScheduleList() {
-            const scheduleList = document.getElementById('scheduleList');
-            scheduleList.innerHTML = periods.map(period => `
-                <div class="schedule-item" id="period-${period.id}" data-period="${period.id}">
-                    <span class="period-label">${period.label}</span>
-                    <div class="subject-wrapper">
-                           <input type="text" class="subject-input" 
-                               id="subject-${period.id}" 
-                               placeholder="考試科目"
-                               oninput="saveToLocalStorage()"
-                               onchange="saveToLocalStorage()"
-                               onfocus="hideSubjectDisplay(${period.id})"
-                               onblur="updateSubjectDisplay(${period.id})">
-                        <div class="subject-display" id="subject-display-${period.id}" onclick="editSubject(${period.id})">
-                            <span class="marquee-text" id="marquee-${period.id}"></span>
-                        </div>
-                    </div>
-                    <div class="time-inputs">
-                        <input type="time" class="time-input" 
-                               id="start-${period.id}" 
-                               onchange="updateDuration(${period.id}); saveToLocalStorage()">
-                        <span class="time-separator">~</span>
-                        <input type="time" class="time-input" 
-                               id="end-${period.id}" 
-                               onchange="updateDuration(${period.id}); saveToLocalStorage()">
-                    </div>
-                    <span class="duration-display" id="duration-${period.id}">--分</span>
-                </div>
-            `).join('');
+            var scheduleList = document.getElementById('scheduleList');
+            var html = '';
+            for (var i = 0; i < periods.length; i++) {
+                var period = periods[i];
+                html += '<div class="schedule-item" id="period-' + period.id + '" data-period="' + period.id + '">' +
+                    '<span class="period-label">' + period.label + '</span>' +
+                    '<div class="subject-wrapper">' +
+                        '<input type="text" class="subject-input" ' +
+                            'id="subject-' + period.id + '" ' +
+                            'placeholder="考試科目" ' +
+                            'oninput="saveToLocalStorage()" ' +
+                            'onchange="saveToLocalStorage()" ' +
+                            'onfocus="hideSubjectDisplay(' + period.id + ')" ' +
+                            'onblur="updateSubjectDisplay(' + period.id + ')">' +
+                        '<div class="subject-display" id="subject-display-' + period.id + '" onclick="editSubject(' + period.id + ')">' +
+                            '<span class="marquee-text" id="marquee-' + period.id + '"></span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="time-inputs">' +
+                        '<input type="time" class="time-input" ' +
+                            'id="start-' + period.id + '" ' +
+                            'onchange="updateDuration(' + period.id + '); saveToLocalStorage()">' +
+                        '<span class="time-separator">~</span>' +
+                        '<input type="time" class="time-input" ' +
+                            'id="end-' + period.id + '" ' +
+                            'onchange="updateDuration(' + period.id + '); saveToLocalStorage()">' +
+                    '</div>' +
+                    '<span class="duration-display" id="duration-' + period.id + '">--分</span>' +
+                '</div>';
+            }
+            scheduleList.innerHTML = html;
         }
 
         // 隱藏科目顯示區（進入編輯模式）
         function hideSubjectDisplay(periodId) {
-            const display = document.getElementById(`subject-display-${periodId}`);
+            var display = document.getElementById('subject-display-' + periodId);
             if (display) {
                 display.classList.remove('active');
             }
@@ -2598,14 +2956,14 @@
 
         // 更新科目顯示（跑馬燈）
         function updateSubjectDisplay(periodId) {
-            const input = document.getElementById(`subject-${periodId}`);
-            const display = document.getElementById(`subject-display-${periodId}`);
-            const marquee = document.getElementById(`marquee-${periodId}`);
+            var input = document.getElementById('subject-' + periodId);
+            var display = document.getElementById('subject-display-' + periodId);
+            var marquee = document.getElementById('marquee-' + periodId);
 
             // 容錯檢查
             if (!input || !display || !marquee) return;
 
-            const text = (input.value || '').trim();
+            var text = (input.value || '').trim();
 
             // 除錯輸出，瀏覽器 console 可查看
             console.debug('updateSubjectDisplay', periodId, text);
@@ -2635,8 +2993,8 @@
 
         // 點擊顯示區域進入編輯模式
         function editSubject(periodId) {
-            const input = document.getElementById(`subject-${periodId}`);
-            const display = document.getElementById(`subject-display-${periodId}`);
+            var input = document.getElementById('subject-' + periodId);
+            var display = document.getElementById('subject-display-' + periodId);
             if (!input || !display) return;
 
             display.classList.remove('active');
@@ -2647,17 +3005,17 @@
 
         // 計算並顯示考試時長
         function updateDuration(periodId) {
-            const startInput = document.getElementById(`start-${periodId}`);
-            const endInput = document.getElementById(`end-${periodId}`);
-            const durationDisplay = document.getElementById(`duration-${periodId}`);
+            var startInput = document.getElementById('start-' + periodId);
+            var endInput = document.getElementById('end-' + periodId);
+            var durationDisplay = document.getElementById('duration-' + periodId);
             
             if (startInput.value && endInput.value) {
-                const start = timeToMinutes(startInput.value);
-                const end = timeToMinutes(endInput.value);
-                const duration = end - start;
+                var start = timeToMinutes(startInput.value);
+                var end = timeToMinutes(endInput.value);
+                var duration = end - start;
                 
                 if (duration > 0) {
-                    durationDisplay.textContent = `${duration}分鐘`;
+                    durationDisplay.textContent = duration + '分鐘';
                 } else {
                     durationDisplay.textContent = '時間錯誤';
                 }
@@ -2668,15 +3026,63 @@
 
         // 時間轉分鐘
         function timeToMinutes(timeStr) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
+            var parts = timeStr.split(':');
+            var hours = parseInt(parts[0], 10);
+            var minutes = parseInt(parts[1], 10);
             return hours * 60 + minutes;
+        }
+
+        // 時間偏移量（秒），用於調整學校時鐘與網際時間的誤差
+        var timeOffsetSeconds = parseInt(localStorage.getItem('examTimeOffset')) || 0;
+
+        // 調整時間偏移
+        function adjustTimeOffset(seconds) {
+            timeOffsetSeconds += seconds;
+            localStorage.setItem('examTimeOffset', timeOffsetSeconds);
+            updateTimeOffsetDisplay();
+            updateCurrentTime();
+        }
+
+        // 重置時間偏移
+        function resetTimeOffset() {
+            timeOffsetSeconds = 0;
+            localStorage.setItem('examTimeOffset', 0);
+            updateTimeOffsetDisplay();
+            updateCurrentTime();
+        }
+
+        // 更新時間偏移顯示
+        function updateTimeOffsetDisplay() {
+            var display = document.getElementById('timeOffsetDisplay');
+            if (display) {
+                var absSeconds = Math.abs(timeOffsetSeconds);
+                var sign = timeOffsetSeconds >= 0 ? '+' : '-';
+                if (absSeconds >= 60) {
+                    var mins = Math.floor(absSeconds / 60);
+                    var secs = absSeconds % 60;
+                    display.textContent = sign + mins + '分' + secs + '秒';
+                } else {
+                    display.textContent = sign + absSeconds + ' 秒';
+                }
+                // 根據偏移方向變色
+                display.classList.remove('positive', 'negative', 'zero');
+                if (timeOffsetSeconds > 0) {
+                    display.classList.add('positive');
+                } else if (timeOffsetSeconds < 0) {
+                    display.classList.add('negative');
+                } else {
+                    display.classList.add('zero');
+                }
+            }
         }
 
         // 更新當前時間
         function updateCurrentTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('zh-TW', { hour12: false });
-            const dateStr = now.toLocaleDateString('zh-TW', {
+            var realNow = new Date();
+            // 加上偏移量
+            var now = new Date(realNow.getTime() + timeOffsetSeconds * 1000);
+            var timeStr = now.toLocaleTimeString('zh-TW', { hour12: false });
+            var dateStr = now.toLocaleDateString('zh-TW', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
@@ -2690,31 +3096,74 @@
             updatePeriodStatus(now);
         }
 
+        // 追蹤考試結束狀態，避免重複顯示提醒
+        var examEndShownFor = null;
+        var examEndTimer = null;
+
+        // 顯示考試結束提醒視窗
+        function showExamEndAlert() {
+            var overlay = document.getElementById('examEndOverlay');
+            var countdownEl = document.getElementById('examEndCountdown');
+            overlay.classList.add('active');
+            
+            var countdown = 10;
+            countdownEl.textContent = countdown;
+            
+            if (examEndTimer) {
+                clearInterval(examEndTimer);
+            }
+            
+            examEndTimer = setInterval(function() {
+                countdown--;
+                countdownEl.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(examEndTimer);
+                    examEndTimer = null;
+                    overlay.classList.remove('active');
+                }
+            }, 1000);
+        }
+
         // 更新倒數計時
         function updateCountdowns(now) {
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            const currentSeconds = now.getSeconds();
+            var currentMinutes = now.getHours() * 60 + now.getMinutes();
+            var currentSeconds = now.getSeconds();
+            var currentTotalSeconds = currentMinutes * 60 + currentSeconds;
             
-            let nextExam = null;
-            let currentExam = null;
+            var nextExam = null;
+            var nextPeriod = null; // 下一節課（包含自習）
+            var currentExam = null;
             
             // 找出下一節考試和當前考試
-            for (const period of periods) {
-                const startInput = document.getElementById(`start-${period.id}`);
-                const endInput = document.getElementById(`end-${period.id}`);
-                const subjectInput = document.getElementById(`subject-${period.id}`);
+            for (var i = 0; i < periods.length; i++) {
+                var period = periods[i];
+                var startInput = document.getElementById('start-' + period.id);
+                var endInput = document.getElementById('end-' + period.id);
+                var subjectInput = document.getElementById('subject-' + period.id);
                 
                 if (startInput.value && endInput.value) {
-                    const startMinutes = timeToMinutes(startInput.value);
-                    const endMinutes = timeToMinutes(endInput.value);
-                    const subjectName = subjectInput.value || '';
+                    var startMinutes = timeToMinutes(startInput.value);
+                    var endMinutes = timeToMinutes(endInput.value);
+                    var subjectName = subjectInput.value || '';
                     
-                    // 檢查是否為當前考試
+                    // 檢查是否為當前節次
                     if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                         currentExam = {
                             period: period,
                             subject: subjectName || '未設定科目',
                             endMinutes: endMinutes,
+                            startMinutes: startMinutes,
+                            isSelfStudy: isSelfStudySubject(subjectName)
+                        };
+                    }
+                    
+                    // 找出下一節課（包含所有類型，用於計算下課時間）
+                    if (startMinutes > currentMinutes && !nextPeriod) {
+                        nextPeriod = {
+                            period: period,
+                            subject: subjectName || '未設定科目',
+                            startMinutes: startMinutes,
                             isSelfStudy: isSelfStudySubject(subjectName)
                         };
                     }
@@ -2727,36 +3176,76 @@
                             startMinutes: startMinutes
                         };
                     }
+                    
+                    // 檢查是否剛結束考試（非自習類）
+                    // 在結束時間的第一秒觸發提醒
+                    if (currentMinutes === endMinutes && currentSeconds === 0 && !isSelfStudySubject(subjectName)) {
+                        var examKey = period.id + '-' + endMinutes;
+                        if (examEndShownFor !== examKey) {
+                            examEndShownFor = examKey;
+                            showExamEndAlert();
+                        }
+                    }
                 }
             }
             
-            // 更新下一節考試倒數
-            const nextExamCountdown = document.getElementById('nextExamCountdown');
-            const nextExamInfo = document.getElementById('nextExamInfo');
-            const nextExamBox = nextExamCountdown.closest('.countdown-box');
-            
-            if (nextExam) {
-                const diffMinutes = nextExam.startMinutes - currentMinutes;
-                const diffSeconds = diffMinutes * 60 - currentSeconds;
-                nextExamCountdown.textContent = formatCountdown(diffSeconds);
-                nextExamInfo.textContent = `${nextExam.period.label}：${nextExam.subject}`;
-            } else {
-                nextExamCountdown.textContent = '--:--:--';
-                nextExamInfo.textContent = '今日考試已結束';
-            }
-            
-            // 更新本節剩餘時間
-            const remainingTime = document.getElementById('remainingTime');
-            const currentExamInfo = document.getElementById('currentExamInfo');
-            const remainingBox = remainingTime.closest('.countdown-box');
+            // 取得倒數計時區域元素
+            var nextExamBox = document.getElementById('nextExamCountdown').closest('.countdown-box');
+            var remainingBox = document.getElementById('remainingTime').closest('.countdown-box');
+            var nextExamCountdown = document.getElementById('nextExamCountdown');
+            var nextExamInfo = document.getElementById('nextExamInfo');
+            var nextExamTitle = document.getElementById('nextExamTitle');
+            var remainingTime = document.getElementById('remainingTime');
+            var currentExamInfo = document.getElementById('currentExamInfo');
+            var remainingTitle = document.getElementById('remainingTitle');
             
             remainingBox.classList.remove('warning', 'danger');
             
-            if (currentExam) {
-                const diffMinutes = currentExam.endMinutes - currentMinutes;
-                const diffSeconds = diffMinutes * 60 - currentSeconds;
-                remainingTime.textContent = formatCountdown(diffSeconds);
-                currentExamInfo.textContent = `${currentExam.period.label}：${currentExam.subject}`;
+            // 判斷顯示邏輯
+            if (currentExam && currentExam.isSelfStudy) {
+                // 當節是自習/複習，隱藏「本節剩餘時間」，只顯示「距離下一節考試」
+                remainingBox.style.display = 'none';
+                nextExamBox.style.display = 'block';
+                nextExamBox.style.flex = '1';
+                nextExamBox.style.width = '100%';
+                nextExamBox.style.marginRight = '0';
+                
+                if (nextExam) {
+                    var diffSeconds = nextExam.startMinutes * 60 - currentTotalSeconds;
+                    nextExamCountdown.textContent = formatCountdown(diffSeconds);
+                    // 判斷是否在預備鐘時間內
+                    if (diffSeconds <= 180 && diffSeconds > 0) {
+                        nextExamTitle.textContent = '🔔 預備鐘倒數';
+                        nextExamInfo.innerHTML = nextExam.period.label + '：' + nextExam.subject + '<br>即將開始';
+                        nextExamInfo.classList.add('multiline');
+                        nextExamBox.classList.add('warning');
+                    } else {
+                        nextExamTitle.textContent = '📍 距離下一節考試';
+                        nextExamInfo.textContent = nextExam.period.label + '：' + nextExam.subject;
+                        nextExamInfo.classList.add('multiline');
+                        nextExamBox.classList.remove('warning');
+                    }
+                } else {
+                    nextExamCountdown.textContent = '--:--:--';
+                    nextExamTitle.textContent = '📍 距離下一節考試';
+                    nextExamInfo.textContent = '今日考試已結束';
+                    nextExamInfo.classList.add('multiline');
+                    nextExamBox.classList.remove('warning');
+                }
+            } else if (currentExam && !currentExam.isSelfStudy) {
+                // 當節是真正的考試，隱藏「距離下一節考試」，只顯示「本節剩餘時間」
+                nextExamBox.style.display = 'none';
+                remainingBox.style.display = 'block';
+                remainingBox.style.flex = '1';
+                remainingBox.style.width = '100%';
+                remainingBox.style.marginRight = '0';
+                
+                remainingTitle.textContent = '⏱️ 本節剩餘時間';
+                var diffMinutes = currentExam.endMinutes - currentMinutes;
+                var diffSeconds2 = currentExam.endMinutes * 60 - currentTotalSeconds;
+                remainingTime.textContent = formatCountdown(diffSeconds2);
+                currentExamInfo.textContent = currentExam.period.label + '：' + currentExam.subject;
+                currentExamInfo.classList.add('multiline');
                 
                 // 根據剩餘時間變更顏色
                 if (diffMinutes <= 5) {
@@ -2765,45 +3254,115 @@
                     remainingBox.classList.add('warning');
                 }
             } else {
-                remainingTime.textContent = '--:--:--';
-                currentExamInfo.textContent = '目前無進行中的考試';
+                // 沒有任何進行中的節次（下課時間）
+                // 顯示兩個區塊：距離下一節考試 + 下課時間倒數
+                nextExamBox.style.display = 'block';
+                remainingBox.style.display = 'block';
+                nextExamBox.style.flex = '1';
+                remainingBox.style.flex = '1';
+                nextExamBox.style.width = '';
+                remainingBox.style.width = '';
+                nextExamBox.style.marginRight = '';
+                remainingBox.style.marginRight = '0';
+                
+                // 更新「距離下一節考試」
+                if (nextExam) {
+                    var diffSeconds3 = nextExam.startMinutes * 60 - currentTotalSeconds;
+                    nextExamCountdown.textContent = formatCountdown(diffSeconds3);
+                    // 判斷是否在預備鐘時間內
+                    if (diffSeconds3 <= 180 && diffSeconds3 > 0) {
+                        nextExamTitle.textContent = '🔔 預備鐘倒數';
+                        nextExamInfo.innerHTML = nextExam.period.label + '：' + nextExam.subject + '<br>即將開始';
+                        nextExamInfo.classList.add('multiline');
+                        nextExamBox.classList.add('warning');
+                    } else {
+                        nextExamTitle.textContent = '📍 距離下一節考試';
+                        nextExamInfo.textContent = nextExam.period.label + '：' + nextExam.subject;
+                        nextExamInfo.classList.add('multiline');
+                        nextExamBox.classList.remove('warning');
+                    }
+                } else {
+                    nextExamCountdown.textContent = '--:--:--';
+                    nextExamTitle.textContent = '📍 距離下一節考試';
+                    nextExamInfo.textContent = '今日考試已結束';
+                    nextExamInfo.classList.add('multiline');
+                    nextExamBox.classList.remove('warning');
+                }
+                
+                // 更新「下課時間倒數」（減掉3分鐘預備鐘時間）
+                remainingTitle.textContent = '☕ 下課時間倒數';
+                if (nextPeriod) {
+                    // 下課時間 = 距離下一節開始的時間 - 3分鐘預備鐘時間
+                    var breakTimeSeconds = nextPeriod.startMinutes * 60 - currentTotalSeconds - 180;
+                    if (breakTimeSeconds > 0) {
+                        remainingTime.textContent = formatCountdown(breakTimeSeconds);
+                        currentExamInfo.textContent = '距離預備鐘響起';
+                        currentExamInfo.classList.add('multiline');
+                        
+                        // 下課時間剩餘不到1分鐘時變色提醒
+                        if (breakTimeSeconds <= 60) {
+                            remainingBox.classList.add('warning');
+                        }
+                    } else {
+                        // 已經是預備鐘時間了
+                        remainingTime.textContent = '00:00:00';
+                        // 根據下一節是否為自習課顯示不同文字
+                        if (nextPeriod.isSelfStudy) {
+                            currentExamInfo.innerHTML = '預備鐘已響<br>請準備複習考試';
+                        } else {
+                            currentExamInfo.innerHTML = '預備鐘已響<br>請準備考試';
+                        }
+                        currentExamInfo.classList.add('multiline');
+                        remainingBox.classList.add('warning');
+                    }
+                } else {
+                    remainingTime.textContent = '--:--:--';
+                    currentExamInfo.textContent = '今日課程已結束';
+                    currentExamInfo.classList.add('multiline');
+                }
             }
         }
 
         // 判斷是否為自習類科目（這些科目不計入考試倒數）
         function isSelfStudySubject(subjectName) {
             if (!subjectName) return false;
-            const name = subjectName.trim().toLowerCase();
+            var name = subjectName.trim().toLowerCase();
             // 自習相關關鍵字
-            const selfStudyKeywords = ['自習', '自修', '複習', '温習', '溫習', '休息', '空堂', '午休', '午餐', '早自習', '晚自習'];
-            return selfStudyKeywords.some(keyword => name.includes(keyword));
+            var selfStudyKeywords = ['自習', '自修', '複習', '温習', '溫習', '休息', '空堂', '午休', '午餐', '早自習', '晚自習'];
+            for (var i = 0; i < selfStudyKeywords.length; i++) {
+                if (name.indexOf(selfStudyKeywords[i]) !== -1) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         // 格式化倒數時間
         function formatCountdown(totalSeconds) {
             if (totalSeconds < 0) return '--:--:--';
             
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
+            var hours = Math.floor(totalSeconds / 3600);
+            var minutes = Math.floor((totalSeconds % 3600) / 60);
+            var seconds = totalSeconds % 60;
             
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
         }
 
         // 更新節次狀態
         function updatePeriodStatus(now) {
-            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            var currentMinutes = now.getHours() * 60 + now.getMinutes();
             
-            for (const period of periods) {
-                const periodElement = document.getElementById(`period-${period.id}`);
-                const startInput = document.getElementById(`start-${period.id}`);
-                const endInput = document.getElementById(`end-${period.id}`);
+            for (var i = 0; i < periods.length; i++) {
+                var period = periods[i];
+                var periodElement = document.getElementById('period-' + period.id);
+                var startInput = document.getElementById('start-' + period.id);
+                var endInput = document.getElementById('end-' + period.id);
                 
                 periodElement.classList.remove('active', 'completed', 'upcoming');
                 
                 if (startInput.value && endInput.value) {
-                    const startMinutes = timeToMinutes(startInput.value);
-                    const endMinutes = timeToMinutes(endInput.value);
+                    var startMinutes = timeToMinutes(startInput.value);
+                    var endMinutes = timeToMinutes(endInput.value);
                     
                     if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                         periodElement.classList.add('active');
@@ -2818,20 +3377,24 @@
 
         // 計算缺席人數
         function updateAbsentCount() {
-            const expected = parseInt(document.getElementById('expectedCount').value) || 0;
-            const actual = parseInt(document.getElementById('actualCount').value) || 0;
+            var expected = parseInt(document.getElementById('expectedCount').value) || 0;
+            var actual = parseInt(document.getElementById('actualCount').value) || 0;
             document.getElementById('absentCount').value = Math.max(0, expected - actual);
         }
 
         // 切換規則編輯模式（雙擊進入編輯）
         function toggleRulesEdit() {
-            const rulesContent = document.getElementById('rulesContent');
-            const rulesList = document.getElementById('rulesList');
-            const rulesTextarea = document.getElementById('rulesTextarea');
+            var rulesContent = document.getElementById('rulesContent');
+            var rulesList = document.getElementById('rulesList');
+            var rulesTextarea = document.getElementById('rulesTextarea');
             
             if (rulesTextarea.style.display === 'none' || rulesTextarea.style.display === '') {
                 // 進入編輯模式
-                const rules = Array.from(rulesList.querySelectorAll('li')).map(li => li.textContent);
+                var liElements = rulesList.querySelectorAll('li');
+                var rules = [];
+                for (var i = 0; i < liElements.length; i++) {
+                    rules.push(liElements[i].textContent);
+                }
                 rulesTextarea.value = rules.join('\n');
                 rulesContent.style.display = 'none';
                 rulesTextarea.style.display = 'block';
@@ -2844,13 +3407,17 @@
 
         // 儲存規則編輯（失去焦點時自動儲存）
         function saveRulesEdit() {
-            const rulesContent = document.getElementById('rulesContent');
-            const rulesList = document.getElementById('rulesList');
-            const rulesTextarea = document.getElementById('rulesTextarea');
+            var rulesContent = document.getElementById('rulesContent');
+            var rulesList = document.getElementById('rulesList');
+            var rulesTextarea = document.getElementById('rulesTextarea');
             
             // 儲存並退出編輯模式
-            const rules = rulesTextarea.value.split('\n').filter(r => r.trim());
-            rulesList.innerHTML = rules.map(rule => `<li>${rule}</li>`).join('');
+            var rulesArr = rulesTextarea.value.split('\n').filter(function(r) { return r.trim(); });
+            var rulesHtml = '';
+            for (var i = 0; i < rulesArr.length; i++) {
+                rulesHtml += '<li>' + rulesArr[i] + '</li>';
+            }
+            rulesList.innerHTML = rulesHtml;
             rulesTextarea.style.display = 'none';
             rulesContent.style.display = 'block';
             saveToLocalStorage();
@@ -2861,21 +3428,21 @@
 
         // 切換左側考試科目面板收納
         function toggleSchedulePanel() {
-            const panel = document.getElementById('schedulePanel');
+            var panel = document.getElementById('schedulePanel');
             panel.classList.toggle('collapsed');
             saveSchedulePanelState();
         }
 
         // 儲存面板狀態
         function saveSchedulePanelState() {
-            const panel = document.getElementById('schedulePanel');
+            var panel = document.getElementById('schedulePanel');
             localStorage.setItem('schedulePanelCollapsed', panel.classList.contains('collapsed'));
         }
 
         // 載入面板狀態
         function loadSchedulePanelState() {
-            const isCollapsed = localStorage.getItem('schedulePanelCollapsed') === 'true';
-            const panel = document.getElementById('schedulePanel');
+            var isCollapsed = localStorage.getItem('schedulePanelCollapsed') === 'true';
+            var panel = document.getElementById('schedulePanel');
             if (isCollapsed) {
                 panel.classList.add('collapsed');
             }
@@ -2892,8 +3459,8 @@
 
         // 切換底部控制列顯示/隱藏
         function toggleFooter() {
-            const footer = document.querySelector('.footer');
-            const toggleBtn = document.getElementById('toggleFooterBtn');
+            var footer = document.querySelector('.footer');
+            var toggleBtn = document.getElementById('toggleFooterBtn');
             
             footer.classList.toggle('hidden');
             
@@ -2911,9 +3478,9 @@
 
         // 載入控制列顯示狀態
         function loadFooterState() {
-            const isHidden = localStorage.getItem('footerHidden') === 'true';
-            const footer = document.querySelector('.footer');
-            const toggleBtn = document.getElementById('toggleFooterBtn');
+            var isHidden = localStorage.getItem('footerHidden') === 'true';
+            var footer = document.querySelector('.footer');
+            var toggleBtn = document.getElementById('toggleFooterBtn');
             
             if (isHidden) {
                 footer.classList.add('hidden');
@@ -2927,19 +3494,29 @@
 
         // 儲存資料到 localStorage
         function saveToLocalStorage() {
-            const data = {
-                periods: periods.map(p => ({
+            var periodsData = [];
+            for (var i = 0; i < periods.length; i++) {
+                var p = periods[i];
+                periodsData.push({
                     id: p.id,
-                    subject: document.getElementById(`subject-${p.id}`).value,
-                    startTime: document.getElementById(`start-${p.id}`).value,
-                    endTime: document.getElementById(`end-${p.id}`).value
-                })),
+                    subject: document.getElementById('subject-' + p.id).value,
+                    startTime: document.getElementById('start-' + p.id).value,
+                    endTime: document.getElementById('end-' + p.id).value
+                });
+            }
+            var rulesLiElements = document.getElementById('rulesList').querySelectorAll('li');
+            var rulesData = [];
+            for (var j = 0; j < rulesLiElements.length; j++) {
+                rulesData.push(rulesLiElements[j].textContent);
+            }
+            var data = {
+                periods: periodsData,
                 attendance: {
                     expected: document.getElementById('expectedCount').value,
                     actual: document.getElementById('actualCount').value,
                     remarks: document.getElementById('remarks').value
                 },
-                rules: Array.from(document.getElementById('rulesList').querySelectorAll('li')).map(li => li.textContent)
+                rules: rulesData
             };
             
             localStorage.setItem('examDashboardData', JSON.stringify(data));
@@ -2947,18 +3524,19 @@
 
         // 從 localStorage 載入資料
         function loadFromLocalStorage() {
-            const savedData = localStorage.getItem('examDashboardData');
+            var savedData = localStorage.getItem('examDashboardData');
             if (savedData) {
-                const data = JSON.parse(savedData);
+                var data = JSON.parse(savedData);
                 
                 // 載入節次資料
-                data.periods.forEach(p => {
-                    document.getElementById(`subject-${p.id}`).value = p.subject || '';
-                    document.getElementById(`start-${p.id}`).value = p.startTime || '';
-                    document.getElementById(`end-${p.id}`).value = p.endTime || '';
+                for (var i = 0; i < data.periods.length; i++) {
+                    var p = data.periods[i];
+                    document.getElementById('subject-' + p.id).value = p.subject || '';
+                    document.getElementById('start-' + p.id).value = p.startTime || '';
+                    document.getElementById('end-' + p.id).value = p.endTime || '';
                     updateDuration(p.id);
                     updateSubjectDisplay(p.id);
-                });
+                }
                 
                 // 載入人數統計
                 if (data.attendance) {
@@ -2970,7 +3548,11 @@
                 
                 // 載入考試規則
                 if (data.rules && data.rules.length > 0) {
-                    document.getElementById('rulesList').innerHTML = data.rules.map(rule => `<li>${rule}</li>`).join('');
+                    var rulesHtml = '';
+                    for (var j = 0; j < data.rules.length; j++) {
+                        rulesHtml += '<li>' + data.rules[j] + '</li>';
+                    }
+                    document.getElementById('rulesList').innerHTML = rulesHtml;
                 }
             } else {
                 // 沒有儲存資料時，使用預設考試時間
@@ -2980,11 +3562,12 @@
 
         // 載入預設考試時間
         function loadDefaultTimes() {
-            periods.forEach(period => {
-                document.getElementById(`start-${period.id}`).value = period.defaultStart;
-                document.getElementById(`end-${period.id}`).value = period.defaultEnd;
+            for (var i = 0; i < periods.length; i++) {
+                var period = periods[i];
+                document.getElementById('start-' + period.id).value = period.defaultStart;
+                document.getElementById('end-' + period.id).value = period.defaultEnd;
                 updateDuration(period.id);
-            });
+            }
         }
 
         // 儲存資料（顯示提示）
@@ -3023,6 +3606,7 @@
         loadFromLocalStorage();
         loadFooterState();
         loadSchedulePanelState();
+        updateTimeOffsetDisplay();
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
 
@@ -3042,23 +3626,28 @@
         });
 
         // 輪播功能
-        let currentSlide = 0;
-        const totalSlides = 2;
-        let carouselInterval;
-        const CAROUSEL_DELAY = 8000; // 8秒切換
+        var currentSlide = 0;
+        var totalSlides = 2;
+        var carouselInterval;
+        var CAROUSEL_DELAY = 8000; // 8秒切換
 
         function updateCarousel() {
-            const slides = document.getElementById('carouselSlides');
-            const dots = document.querySelectorAll('.carousel-dot');
-            const progress = document.getElementById('carouselProgress');
+            var slides = document.getElementById('carouselSlides');
+            var dots = document.querySelectorAll('.carousel-dot');
+            var progress = document.getElementById('carouselProgress');
             
             slides.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
             
             // 更新所有頁面的 carousel-dot 狀態
-            dots.forEach(function(dot, index) {
+            for (var i = 0; i < dots.length; i++) {
+                var dot = dots[i];
                 // 每個頁面有 2 個 dot，所以用 index % 2
-                dot.classList.toggle('active', (index % totalSlides) === currentSlide);
-            });
+                if ((i % totalSlides) === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            }
             
             // 重置進度條動畫
             progress.style.animation = 'none';
@@ -3109,9 +3698,9 @@
 
         // ===== 主題切換功能 =====
         function toggleTheme() {
-            const body = document.body;
-            const themeIcon = document.getElementById('themeIcon');
-            const themeText = document.getElementById('themeText');
+            var body = document.body;
+            var themeIcon = document.getElementById('themeIcon');
+            var themeText = document.getElementById('themeText');
             
             if (body.classList.contains('light-mode')) {
                 // 切換到深色模式
@@ -3130,9 +3719,9 @@
 
         // 載入主題設定
         function loadTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const themeIcon = document.getElementById('themeIcon');
-            const themeText = document.getElementById('themeText');
+            var savedTheme = localStorage.getItem('theme');
+            var themeIcon = document.getElementById('themeIcon');
+            var themeText = document.getElementById('themeText');
             
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
@@ -3149,17 +3738,17 @@
         loadTheme();
 
         // ===== 文字縮放功能 =====
-        const zoomLevels = {
+        var zoomLevels = {
             remarks: 100,
             rules: 100
         };
-        const ZOOM_MIN = 70;
-        const ZOOM_MAX = 150;
-        const ZOOM_STEP = 10;
+        var ZOOM_MIN = 70;
+        var ZOOM_MAX = 150;
+        var ZOOM_STEP = 10;
 
         function zoomText(target, direction) {
             // 計算新的縮放比例
-            let newLevel = zoomLevels[target] + (direction * ZOOM_STEP);
+            var newLevel = zoomLevels[target] + (direction * ZOOM_STEP);
             newLevel = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newLevel));
             zoomLevels[target] = newLevel;
 
@@ -3168,13 +3757,13 @@
 
             // 應用縮放
             if (target === 'remarks') {
-                const remarksInput = document.getElementById('remarks');
+                var remarksInput = document.getElementById('remarks');
                 if (remarksInput) {
                     remarksInput.style.fontSize = (newLevel / 100) + 'em';
                 }
             } else if (target === 'rules') {
-                const rulesContent = document.getElementById('rulesContent');
-                const rulesTextarea = document.getElementById('rulesTextarea');
+                var rulesContent = document.getElementById('rulesContent');
+                var rulesTextarea = document.getElementById('rulesTextarea');
                 if (rulesContent) {
                     rulesContent.style.fontSize = (newLevel / 100) + 'em';
                 }
@@ -3192,13 +3781,13 @@
         }
 
         function loadZoomSettings() {
-            const saved = localStorage.getItem('zoomLevels');
+            var saved = localStorage.getItem('zoomLevels');
             if (saved) {
-                const parsed = JSON.parse(saved);
+                var parsed = JSON.parse(saved);
                 if (parsed.remarks) {
                     zoomLevels.remarks = parsed.remarks;
                     document.getElementById('remarks-zoom-level').textContent = parsed.remarks + '%';
-                    const remarksInput = document.getElementById('remarks');
+                    var remarksInput = document.getElementById('remarks');
                     if (remarksInput) {
                         remarksInput.style.fontSize = (parsed.remarks / 100) + 'em';
                     }
@@ -3206,8 +3795,8 @@
                 if (parsed.rules) {
                     zoomLevels.rules = parsed.rules;
                     document.getElementById('rules-zoom-level').textContent = parsed.rules + '%';
-                    const rulesContent = document.getElementById('rulesContent');
-                    const rulesTextarea = document.getElementById('rulesTextarea');
+                    var rulesContent = document.getElementById('rulesContent');
+                    var rulesTextarea = document.getElementById('rulesTextarea');
                     if (rulesContent) {
                         rulesContent.style.fontSize = (parsed.rules / 100) + 'em';
                     }
@@ -3369,9 +3958,10 @@
         // 綁定考試科目輸入框事件
         function bindSubjectInputEvents() {
             var subjectInputs = document.querySelectorAll('.subject-input');
-            subjectInputs.forEach(function(input) {
+            for (var i = 0; i < subjectInputs.length; i++) {
+                var input = subjectInputs[i];
                 // 避免重複綁定
-                if (input.dataset.floatingBound) return;
+                if (input.dataset.floatingBound) continue;
                 input.dataset.floatingBound = 'true';
                 
                 input.addEventListener('focus', function(e) {
@@ -3380,7 +3970,7 @@
                         this.blur();
                     }
                 });
-            });
+            }
         }
 
         // 初始化科目輸入框事件
