@@ -2072,55 +2072,47 @@
             background: rgba(0, 0, 0, 0.3);
         }
 
-        /* 觸控輸入模式 - 當鍵盤彈出時 */
-        .touch-input-mode .main-container {
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .touch-input-mode .carousel-container {
-            overflow: visible;
-        }
-
-        .touch-input-active {
-            position: fixed !important;
-            top: 10px !important;
-            left: 10px !important;
-            right: 10px !important;
-            z-index: 9999 !important;
-            background: #1a1a2e !important;
-            -webkit-border-radius: 10px !important;
-            -moz-border-radius: 10px !important;
-            border-radius: 10px !important;
-            padding: 15px !important;
-            -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5) !important;
-            -moz-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5) !important;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5) !important;
-            max-height: 35vh !important;
-        }
-
-        .touch-input-active:focus {
-            outline: 2px solid #00d9ff !important;
-        }
-
-        /* 科目輸入框的觸控模式（單行） */
-        .subject-input.touch-input-active {
-            max-height: 60px !important;
+        /* ===== 觸控螢幕鍵盤適應 ===== */
+        
+        /* 鍵盤彈出時的基本調整 */
+        .keyboard-open {
+            overflow: auto !important;
             height: auto !important;
-            padding: 15px 20px !important;
-            font-size: 1.3rem !important;
+            min-height: 100vh;
         }
 
-        .light-mode .touch-input-active {
-            background: #fff !important;
-            -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
-            -moz-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
+        .keyboard-open .main-container {
+            overflow: visible !important;
+            height: auto !important;
+            min-height: auto;
+            padding-bottom: 50vh;
         }
 
-        /* 觸控輸入模式的標題列 */
-        .touch-input-header {
+        /* 統一輸入框焦點樣式 */
+        .input-focused {
+            position: relative;
+            z-index: 1000;
+        }
+
+        /* 導航列 - 固定在頂部 */
+        .keyboard-open .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* 輸入提示框 */
+        .input-hint-bar {
             display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(233, 69, 96, 0.95);
+            color: #fff;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            z-index: 9998;
             -webkit-box-pack: justify;
             -webkit-justify-content: space-between;
             -moz-box-pack: justify;
@@ -2131,12 +2123,12 @@
             -moz-box-align: center;
             -ms-flex-align: center;
             align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            -webkit-box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            -moz-box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .touch-input-header.active {
+        .input-hint-bar.active {
             display: -webkit-box;
             display: -webkit-flex;
             display: -moz-box;
@@ -2144,18 +2136,123 @@
             display: flex;
         }
 
-        .touch-input-header .title {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #e94560;
+        .input-hint-bar .hint-text {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
         }
 
-        .touch-input-header .close-btn {
-            background: rgba(244, 67, 54, 0.8);
+        .input-hint-bar .hint-text span {
+            margin-left: 8px;
+        }
+
+        .input-hint-bar .done-btn {
+            background: #fff;
+            color: #e94560;
             border: none;
+            padding: 8px 20px;
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .input-hint-bar .done-btn:hover {
+            background: #f0f0f0;
+        }
+
+        /* 輸入區域的輔助框 */
+        .input-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .input-overlay.active {
+            display: block;
+        }
+
+        /* 浮動輸入區域 */
+        .floating-input-container {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 10px;
+            right: 10px;
+            max-height: calc(40vh - 60px);
+            background: #1a1a2e;
+            -webkit-border-radius: 12px;
+            -moz-border-radius: 12px;
+            border-radius: 12px;
+            z-index: 1001;
+            -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            -moz-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+
+        .floating-input-container.active {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .floating-input-header {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: justify;
+            -webkit-justify-content: space-between;
+            -moz-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(233, 69, 96, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .floating-input-header .title {
+            font-weight: bold;
+            color: #e94560;
+            font-size: 1rem;
+        }
+
+        .floating-input-header .close-btn {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             color: #fff;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             -webkit-border-radius: 50%;
             -moz-border-radius: 50%;
             border-radius: 50%;
@@ -2176,27 +2273,82 @@
             -moz-box-pack: center;
             -ms-flex-pack: center;
             justify-content: center;
+            -webkit-transition: all 0.2s ease;
+            -moz-transition: all 0.2s ease;
+            -o-transition: all 0.2s ease;
+            transition: all 0.2s ease;
         }
 
-        .touch-input-header .close-btn:hover {
-            background: #f44336;
+        .floating-input-header .close-btn:hover {
+            background: #e94560;
+            border-color: #e94560;
         }
 
-        .light-mode .touch-input-header {
+        .floating-input-body {
+            padding: 15px;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .floating-input-body input,
+        .floating-input-body textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .floating-input-body input:focus,
+        .floating-input-body textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .floating-input-body textarea {
+            min-height: 100px;
+            resize: none;
+        }
+
+        /* 淺色模式 */
+        .light-mode .floating-input-container {
+            background: #fff;
+            -webkit-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+            -moz-box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .floating-input-header {
+            background: rgba(233, 69, 96, 0.1);
             border-bottom-color: rgba(0, 0, 0, 0.1);
         }
 
-        .light-mode .touch-input-header .title {
+        .light-mode .floating-input-header .title {
             color: #c53050;
         }
 
-        /* 過渡動畫 */
-        .remarks-input,
-        .rules-textarea {
-            -webkit-transition: all 0.3s ease;
-            -moz-transition: all 0.3s ease;
-            -o-transition: all 0.3s ease;
-            transition: all 0.3s ease;
+        .light-mode .floating-input-header .close-btn {
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        .light-mode .floating-input-body input,
+        .light-mode .floating-input-body textarea {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #333;
+        }
+
+        .light-mode .input-hint-bar {
+            background: rgba(197, 48, 80, 0.95);
         }
 
     </style>
@@ -2345,6 +2497,29 @@
             <span>系統運行中</span>
         </div>
     </footer>
+
+    <!-- 浮動輸入區域遮罩 -->
+    <div class="input-overlay" id="inputOverlay" onclick="closeFloatingInput()"></div>
+    
+    <!-- 浮動輸入區域 -->
+    <div class="floating-input-container" id="floatingInputContainer">
+        <div class="floating-input-header">
+            <span class="title" id="floatingInputTitle">輸入</span>
+            <button class="close-btn" onclick="closeFloatingInput()" title="完成">✕</button>
+        </div>
+        <div class="floating-input-body" id="floatingInputBody">
+            <!-- 動態插入輸入框 -->
+        </div>
+    </div>
+
+    <!-- 輸入提示列 -->
+    <div class="input-hint-bar" id="inputHintBar">
+        <div class="hint-text">
+            <span>⌨️</span>
+            <span id="inputHintText">正在輸入...</span>
+        </div>
+        <button class="done-btn" onclick="closeFloatingInput()">完成</button>
+    </div>
 
     <script>
         // 節次資料（含預設考試時間）
@@ -3031,22 +3206,18 @@
                    (navigator.msMaxTouchPoints > 0);
         }
 
-        // 儲存原始位置資訊
-        let originalPosition = null;
-        let activeInput = null;
+        // 浮動輸入框狀態
+        var floatingInputActive = false;
+        var floatingInputSource = null;
+        var floatingInputType = null;
 
-        // 啟用觸控輸入模式
-        function enableTouchInputMode(inputElement, title) {
-            if (!isTouchDevice()) return;
-            
-            // 如果已經有活動的輸入框，先關閉
-            if (activeInput && activeInput !== inputElement) {
-                disableTouchInputMode();
-            }
+        // 開啟浮動輸入區域
+        function openFloatingInput(sourceElement, title, inputType) {
+            if (!isTouchDevice()) return false;
 
-            activeInput = inputElement;
-            document.body.classList.add('touch-input-mode');
-            inputElement.classList.add('touch-input-active');
+            floatingInputSource = sourceElement;
+            floatingInputType = inputType;
+            floatingInputActive = true;
 
             // 暫停輪播
             clearInterval(carouselInterval);
@@ -3055,87 +3226,136 @@
                 progressEl.style.animationPlayState = 'paused';
             }
 
-            // 根據輸入框類型設定高度
-            if (inputElement.classList.contains('subject-input')) {
-                // 科目輸入框是單行，不需要很高
-                inputElement.style.height = 'auto';
-                inputElement.style.minHeight = '50px';
+            // 設定標題
+            document.getElementById('floatingInputTitle').textContent = title;
+            document.getElementById('inputHintText').textContent = '正在輸入：' + title;
+
+            // 建立輸入框
+            var body = document.getElementById('floatingInputBody');
+            var inputElement;
+
+            if (inputType === 'text') {
+                inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.value = sourceElement.value || '';
+                inputElement.placeholder = sourceElement.placeholder || '';
             } else {
-                // 備註和規則是多行文字區域
-                inputElement.style.height = '30vh';
-                inputElement.style.minHeight = '120px';
+                inputElement = document.createElement('textarea');
+                inputElement.value = sourceElement.value || sourceElement.textContent || '';
+                inputElement.placeholder = sourceElement.placeholder || '';
+            }
+
+            inputElement.id = 'floatingInput';
+            body.innerHTML = '';
+            body.appendChild(inputElement);
+
+            // 顯示浮動區域
+            document.getElementById('inputOverlay').classList.add('active');
+            document.getElementById('floatingInputContainer').classList.add('active');
+            document.getElementById('inputHintBar').classList.add('active');
+            document.body.classList.add('keyboard-open');
+
+            // 焦點到輸入框
+            setTimeout(function() {
+                inputElement.focus();
+                if (inputType === 'text') {
+                    inputElement.select();
+                }
+            }, 100);
+
+            // 監聽輸入變化
+            inputElement.addEventListener('input', function() {
+                syncFloatingInput();
+            });
+
+            return true;
+        }
+
+        // 同步浮動輸入框內容到原始元素
+        function syncFloatingInput() {
+            var floatingInput = document.getElementById('floatingInput');
+            if (!floatingInput || !floatingInputSource) return;
+
+            if (floatingInputSource.tagName === 'TEXTAREA' || floatingInputSource.tagName === 'INPUT') {
+                floatingInputSource.value = floatingInput.value;
             }
         }
 
-        // 停用觸控輸入模式
-        function disableTouchInputMode() {
-            if (!activeInput) return;
+        // 關閉浮動輸入區域
+        function closeFloatingInput() {
+            if (!floatingInputActive) return;
 
-            activeInput.classList.remove('touch-input-active');
-            activeInput.style.height = '';
-            activeInput.style.minHeight = '';
-            
-            document.body.classList.remove('touch-input-mode');
-            activeInput = null;
+            // 同步最終內容
+            syncFloatingInput();
+
+            // 隱藏浮動區域
+            document.getElementById('inputOverlay').classList.remove('active');
+            document.getElementById('floatingInputContainer').classList.remove('active');
+            document.getElementById('inputHintBar').classList.remove('active');
+            document.body.classList.remove('keyboard-open');
+
+            // 處理特殊情況
+            if (floatingInputSource) {
+                // 如果是科目輸入框，更新顯示
+                if (floatingInputSource.classList.contains('subject-input')) {
+                    var periodId = floatingInputSource.id.replace('subject-', '');
+                    updateSubjectDisplay(parseInt(periodId));
+                }
+                // 如果是規則輸入框，儲存編輯
+                if (floatingInputSource.id === 'rulesTextarea') {
+                    saveRulesEdit();
+                }
+                // 儲存到 localStorage
+                saveToLocalStorage();
+            }
 
             // 恢復輪播
             startCarouselTimer();
-            document.getElementById('carouselProgress').style.animationPlayState = 'running';
+            var progressEl = document.getElementById('carouselProgress');
+            if (progressEl) {
+                progressEl.style.animationPlayState = 'running';
+            }
+
+            floatingInputActive = false;
+            floatingInputSource = null;
+            floatingInputType = null;
         }
 
         // 綁定備註輸入框事件
-        const remarksInput = document.getElementById('remarks');
+        var remarksInput = document.getElementById('remarks');
         if (remarksInput) {
-            remarksInput.addEventListener('focus', function() {
-                enableTouchInputMode(this, '備註事項');
-            });
-            remarksInput.addEventListener('blur', function() {
-                // 延遲執行以避免點擊其他元素時立即關閉
-                setTimeout(function() {
-                    if (activeInput === remarksInput) {
-                        disableTouchInputMode();
-                    }
-                }, 200);
+            remarksInput.addEventListener('focus', function(e) {
+                if (openFloatingInput(this, '備註事項', 'textarea')) {
+                    e.preventDefault();
+                    this.blur();
+                }
             });
         }
 
         // 綁定考試規則輸入框事件
-        const rulesTextareaEl = document.getElementById('rulesTextarea');
+        var rulesTextareaEl = document.getElementById('rulesTextarea');
         if (rulesTextareaEl) {
-            rulesTextareaEl.addEventListener('focus', function() {
-                enableTouchInputMode(this, '考試規則');
-            });
-            rulesTextareaEl.addEventListener('blur', function() {
-                setTimeout(function() {
-                    if (activeInput === rulesTextareaEl) {
-                        disableTouchInputMode();
-                        saveRulesEdit();
-                    }
-                }, 200);
+            rulesTextareaEl.addEventListener('focus', function(e) {
+                if (openFloatingInput(this, '考試規則', 'textarea')) {
+                    e.preventDefault();
+                    this.blur();
+                }
             });
         }
 
         // 綁定考試科目輸入框事件
         function bindSubjectInputEvents() {
-            const subjectInputs = document.querySelectorAll('.subject-input');
+            var subjectInputs = document.querySelectorAll('.subject-input');
             subjectInputs.forEach(function(input) {
                 // 避免重複綁定
-                if (input.dataset.touchBound) return;
-                input.dataset.touchBound = 'true';
+                if (input.dataset.floatingBound) return;
+                input.dataset.floatingBound = 'true';
                 
-                input.addEventListener('focus', function() {
-                    enableTouchInputMode(this, '考試科目');
-                });
-                input.addEventListener('blur', function() {
-                    const self = this;
-                    setTimeout(function() {
-                        if (activeInput === self) {
-                            disableTouchInputMode();
-                            // 更新科目顯示
-                            const periodId = self.id.replace('subject-', '');
-                            updateSubjectDisplay(parseInt(periodId));
-                        }
-                    }, 200);
+                input.addEventListener('focus', function(e) {
+                    if (openFloatingInput(this, '考試科目', 'text')) {
+                        e.preventDefault();
+                        this.blur();
+                    }
                 });
             });
         }
@@ -3143,17 +3363,32 @@
         // 初始化科目輸入框事件
         bindSubjectInputEvents();
 
-        // 使用 visualViewport API 來偵測鍵盤彈出（如果可用）
+        // 使用 visualViewport API 來調整浮動輸入區域位置
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', function() {
-                if (activeInput) {
-                    // 計算可用高度
-                    const availableHeight = window.visualViewport.height;
-                    const maxInputHeight = Math.min(availableHeight * 0.4, 250);
-                    activeInput.style.maxHeight = maxInputHeight + 'px';
+                if (floatingInputActive) {
+                    var container = document.getElementById('floatingInputContainer');
+                    var availableHeight = window.visualViewport.height;
+                    // 確保浮動區域在可見範圍內
+                    container.style.maxHeight = Math.min(availableHeight * 0.45, 300) + 'px';
+                }
+            });
+
+            window.visualViewport.addEventListener('scroll', function() {
+                if (floatingInputActive) {
+                    var container = document.getElementById('floatingInputContainer');
+                    container.style.top = (window.visualViewport.offsetTop + 10) + 'px';
                 }
             });
         }
+
+        // 按下 Enter 鍵時關閉單行輸入框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && floatingInputActive && floatingInputType === 'text') {
+                e.preventDefault();
+                closeFloatingInput();
+            }
+        });
     </script>
 </body>
 </html>
