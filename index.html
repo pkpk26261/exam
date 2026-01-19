@@ -1,0 +1,2898 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考試監控系統</title>
+    <style>
+        :root {
+            --base-font-size: 14px;
+            --header-title-size: 1.8rem;
+            --time-display-size: 3rem;
+            --date-display-size: 1.1rem;
+            --countdown-size: 2.8rem;
+            --section-title-size: 1.2rem;
+            --normal-text-size: 1rem;
+            --small-text-size: 0.9rem;
+            --countdown-info-size: 1.5rem;
+            --input-text-size: 1rem;
+            --attendance-input-size: 1.8rem;
+            --spacing-unit: 12px;
+            --border-radius: 10px;
+        }
+
+        /* 支援 clamp() 的現代瀏覽器 */
+        @supports (font-size: clamp(1px, 1vw, 2px)) {
+            :root {
+                --base-font-size: clamp(12px, 1.2vw, 16px);
+                --header-title-size: clamp(1.4rem, 2.5vw, 2.2rem);
+                --time-display-size: clamp(2rem, 4vw, 4rem);
+                --date-display-size: clamp(0.9rem, 1.4vw, 1.4rem);
+                --countdown-size: clamp(1.8rem, 3.5vw, 3.5rem);
+                --section-title-size: clamp(1rem, 1.4vw, 1.4rem);
+                --normal-text-size: clamp(0.85rem, 1.1vw, 1.1rem);
+                --small-text-size: clamp(0.75rem, 1vw, 1rem);
+                --countdown-info-size: clamp(1.1rem, 2vw, 2rem);
+                --input-text-size: clamp(0.9rem, 1.1vw, 1.1rem);
+                --attendance-input-size: clamp(1.4rem, 2.2vw, 2.2rem);
+                --spacing-unit: clamp(8px, 1vw, 15px);
+                --border-radius: clamp(8px, 1vw, 15px);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+            font-size: var(--base-font-size);
+            background: #1a1a2e;
+            background: -webkit-linear-gradient(315deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: -moz-linear-gradient(315deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: -o-linear-gradient(315deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+
+        /* 頂部標題區 */
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 24px;
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: justify;
+            -webkit-justify-content: space-between;
+            -moz-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            border-bottom: 3px solid #e94560;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-size: var(--header-title-size);
+            color: #e94560;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+
+        .current-time {
+            font-size: 3rem;
+            font-size: var(--time-display-size);
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255,255,255,0.7);
+            font-family: 'Consolas', monospace;
+        }
+
+        .current-date {
+            font-size: 1.1rem;
+            font-size: var(--date-display-size);
+            color: #aaa;
+        }
+
+        /* 主要內容區 */
+        .main-container {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            padding: 12px;
+            padding: var(--spacing-unit);
+            overflow: hidden;
+        }
+
+        .main-container > * {
+            margin-right: 12px;
+            margin-right: var(--spacing-unit);
+        }
+
+        .main-container > *:last-child {
+            margin-right: 0;
+        }
+
+        /* 左側：考試節次列表 */
+        .schedule-panel {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1 1 55%;
+            -moz-box-flex: 1;
+            -ms-flex: 1 1 55%;
+            flex: 1 1 55%;
+            background: rgba(255, 255, 255, 0.05);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            padding: var(--spacing-unit);
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            position: relative;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            min-width: 0;
+        }
+
+        .schedule-panel.collapsed {
+            -webkit-box-flex: 0;
+            -webkit-flex: 0 0 45px;
+            -moz-box-flex: 0;
+            -ms-flex: 0 0 45px;
+            flex: 0 0 45px;
+            padding: 12px 8px;
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 0.7);
+            overflow: hidden;
+        }
+
+        .schedule-panel.collapsed .schedule-header,
+        .schedule-panel.collapsed .schedule-list {
+            display: none;
+        }
+
+        .schedule-panel.collapsed .panel-toggle {
+            -webkit-transform: rotate(180deg);
+            -moz-transform: rotate(180deg);
+            -ms-transform: rotate(180deg);
+            -o-transform: rotate(180deg);
+            transform: rotate(180deg);
+        }
+
+        .panel-toggle {
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            -webkit-transform: translateY(-50%);
+            -moz-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            -o-transform: translateY(-50%);
+            transform: translateY(-50%);
+            width: 27px;
+            height: 54px;
+            background: rgba(233, 69, 96, 0.8);
+            border: none;
+            -webkit-border-radius: 0 10px 10px 0;
+            -moz-border-radius: 0 10px 10px 0;
+            border-radius: 0 10px 10px 0;
+            color: #fff;
+            cursor: pointer;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .panel-toggle:hover {
+            background: #e94560;
+            right: -18px;
+            width: 36px;
+        }
+
+        .collapsed-label {
+            display: none;
+            -webkit-writing-mode: vertical-rl;
+            -ms-writing-mode: tb-rl;
+            writing-mode: vertical-rl;
+            -webkit-text-orientation: mixed;
+            text-orientation: mixed;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            color: #e94560;
+            font-weight: bold;
+            padding: 12px 0;
+            padding: var(--spacing-unit) 0;
+        }
+
+        .schedule-panel.collapsed .collapsed-label {
+            display: block;
+        }
+
+        .schedule-header {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            padding: 10px 12px;
+            padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit);
+            background: rgba(233, 69, 96, 0.3);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            margin-bottom: 10px;
+            margin-bottom: calc(var(--spacing-unit) * 0.8);
+        }
+
+        .schedule-header span {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .schedule-header span:nth-child(1) {
+            width: 10%;
+            min-width: 50px;
+        }
+
+        .schedule-header span:nth-child(2) {
+            width: 25%;
+            min-width: 100px;
+        }
+
+        .schedule-header span:nth-child(3) {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+
+        .schedule-header span:nth-child(4) {
+            width: 12%;
+            min-width: 50px;
+        }
+
+        .schedule-list {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            overflow-y: auto;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+
+        .schedule-list > * {
+            margin-bottom: 8px;
+        }
+
+        .schedule-list > *:last-child {
+            margin-bottom: 0;
+        }
+
+        .schedule-item {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            padding: 10px 12px;
+            padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit);
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            border-left: 5px solid transparent;
+        }
+
+        .schedule-item > *:nth-child(1) {
+            width: 10%;
+            min-width: 50px;
+        }
+
+        .schedule-item > *:nth-child(2) {
+            width: 25%;
+            min-width: 100px;
+            margin: 0 8px;
+        }
+
+        .schedule-item > *:nth-child(3) {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            margin: 0 8px;
+        }
+
+        .schedule-item > *:nth-child(4) {
+            width: 12%;
+            min-width: 50px;
+        }
+
+        .schedule-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .schedule-item.active {
+            background: rgba(0, 217, 255, 0.15);
+            border-left-color: #00d9ff;
+            -webkit-box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+            -moz-box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .schedule-item.completed {
+            opacity: 0.5;
+            filter: alpha(opacity=50);
+            border-left-color: #4caf50;
+        }
+
+        .schedule-item.upcoming {
+            border-left-color: #ffc107;
+        }
+
+        .period-label {
+            font-weight: bold;
+            color: #e94560;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+        }
+
+        /* 將節次標籤置中 */
+        .period-label {
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 科目輸入欄容器 - 支援跑馬燈 */
+        .subject-wrapper {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .subject-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            width: 100%;
+            text-align: center; /* 科目輸入文字置中 */
+        }
+
+        /* 跑馬燈顯示模式 */
+        .subject-display {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 8px;
+            -moz-border-radius: 8px;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            display: none;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            overflow: hidden;
+            cursor: pointer;
+            pointer-events: none;
+        }
+
+        .subject-display.active {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
+        .subject-display.active + .subject-input,
+        .subject-wrapper.has-value .subject-input {
+            /* 當顯示區啟用時，不需要額外隱藏 input，由 JS 控制 */
+        }
+
+        .subject-input.hidden {
+            visibility: hidden;
+        }
+
+        .subject-display .marquee-text {
+            white-space: nowrap;
+        }
+
+        .subject-display .marquee-text.animate {
+            -webkit-animation: marquee 8s linear infinite;
+            -moz-animation: marquee 8s linear infinite;
+            -o-animation: marquee 8s linear infinite;
+            animation: marquee 8s linear infinite;
+        }
+
+        .subject-display:hover .marquee-text {
+            -webkit-animation-play-state: paused;
+            -moz-animation-play-state: paused;
+            -o-animation-play-state: paused;
+            animation-play-state: paused;
+        }
+
+        @-webkit-keyframes marquee {
+            0% { -webkit-transform: translateX(0); transform: translateX(0); }
+            100% { -webkit-transform: translateX(-50%); transform: translateX(-50%); }
+        }
+
+        @-moz-keyframes marquee {
+            0% { -moz-transform: translateX(0); transform: translateX(0); }
+            100% { -moz-transform: translateX(-50%); transform: translateX(-50%); }
+        }
+
+        @-o-keyframes marquee {
+            0% { -o-transform: translateX(0); transform: translateX(0); }
+            100% { -o-transform: translateX(-50%); transform: translateX(-50%); }
+        }
+
+        @keyframes marquee {
+            0% { -webkit-transform: translateX(0); -moz-transform: translateX(0); -o-transform: translateX(0); transform: translateX(0); }
+            100% { -webkit-transform: translateX(-50%); -moz-transform: translateX(-50%); -o-transform: translateX(-50%); transform: translateX(-50%); }
+        }
+
+        
+
+        .subject-input:focus + .subject-display {
+            display: none !important;
+        }
+
+        .subject-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+            -webkit-box-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+            -moz-box-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+            box-shadow: 0 0 5px rgba(0, 217, 255, 0.5);
+        }
+
+        .time-inputs {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center; /* 水平置中考試時間欄內的輸入元件 */
+        }
+
+        .time-inputs > * {
+            margin-right: 6px;
+        }
+
+        .time-inputs > *:last-child {
+            margin-right: 0;
+        }
+
+        .time-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 6px;
+            -moz-border-radius: 6px;
+            border-radius: 6px;
+            padding: 6px 4px;
+            color: #fff;
+            font-size: 1rem;
+            font-size: var(--input-text-size);
+            width: auto;
+            text-align: center;
+            color-scheme: dark;
+        }
+
+        .time-input::-webkit-calendar-picker-indicator {
+            -webkit-filter: invert(1);
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .time-separator {
+            color: #aaa;
+            font-size: 1rem;
+            font-size: var(--input-text-size);
+        }
+
+        .duration-display {
+            font-size: 0.9rem;
+            font-size: var(--small-text-size);
+            color: #ffc107;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 右側面板 */
+        .right-panel {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1 1 45%;
+            -moz-box-flex: 1;
+            -ms-flex: 1 1 45%;
+            flex: 1 1 45%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            min-width: 0;
+        }
+
+        .right-panel > * {
+            margin-bottom: 12px;
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .right-panel > *:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 倒數計時區 */
+        .countdown-section {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .countdown-section > * {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            margin-right: 12px;
+            margin-right: var(--spacing-unit);
+        }
+
+        .countdown-section > *:last-child {
+            margin-right: 0;
+        }
+
+        .countdown-box {
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            padding: var(--spacing-unit);
+            text-align: center;
+        }
+
+        .countdown-box h3 {
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            color: #aaa;
+            margin-bottom: 6px;
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+        }
+
+        .countdown-value {
+            font-size: 2.8rem;
+            font-size: var(--countdown-size);
+            font-weight: bold;
+            font-family: 'Consolas', monospace;
+        }
+
+        .countdown-box.next-exam .countdown-value {
+            color: #ffc107;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.7);
+        }
+
+        .countdown-box.remaining .countdown-value {
+            color: #f44336;
+            text-shadow: 0 0 10px rgba(244, 67, 54, 0.7);
+        }
+
+        .countdown-box.warning .countdown-value {
+            color: #ff9800;
+        }
+
+        .countdown-box.danger .countdown-value {
+            color: #f44336;
+            -webkit-animation: blink 1s infinite;
+            -moz-animation: blink 1s infinite;
+            -o-animation: blink 1s infinite;
+            animation: blink 1s infinite;
+        }
+
+        @-webkit-keyframes blink {
+            50% { opacity: 0.5; filter: alpha(opacity=50); }
+        }
+
+        @-moz-keyframes blink {
+            50% { opacity: 0.5; }
+        }
+
+        @-o-keyframes blink {
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.5; filter: alpha(opacity=50); }
+        }
+
+        .current-exam-info {
+            font-size: 1.5rem;
+            font-size: var(--countdown-info-size);
+            color: #00d9ff;
+            margin-top: 6px;
+            margin-top: calc(var(--spacing-unit) * 0.5);
+        }
+
+        /* 人數統計區 */
+        .attendance-section {
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            padding: var(--spacing-unit);
+        }
+
+        .attendance-section h3 {
+            font-size: 1.2rem;
+            font-size: var(--section-title-size);
+            color: #e94560;
+            margin-bottom: 12px;
+            margin-bottom: var(--spacing-unit);
+            padding-bottom: 8px;
+            padding-bottom: calc(var(--spacing-unit) * 0.7);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .attendance-grid {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .attendance-grid > * {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            margin-right: 12px;
+            margin-right: var(--spacing-unit);
+        }
+
+        .attendance-grid > *:last-child {
+            margin-right: 0;
+        }
+
+        .attendance-item {
+            text-align: center;
+        }
+
+        .attendance-item label {
+            display: block;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            color: #aaa;
+            margin-bottom: 6px;
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+        }
+
+        .attendance-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            padding: var(--spacing-unit);
+            color: #fff;
+            font-size: 1.8rem;
+            font-size: var(--attendance-input-size);
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+
+        .attendance-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .attendance-input.expected {
+            border-color: rgba(0, 217, 255, 0.5);
+        }
+
+        .attendance-input.actual {
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .remarks-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 10px;
+            padding: calc(var(--spacing-unit) * 0.8);
+            color: #fff;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            width: 100%;
+            resize: none;
+            height: 60px;
+            margin-top: 12px;
+            margin-top: var(--spacing-unit);
+        }
+
+        .remarks-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        /* 輪播容器 */
+        .carousel-container {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.08);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+        }
+
+        .carousel-slides {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-transition: -webkit-transform 0.5s ease;
+            -moz-transition: -moz-transform 0.5s ease;
+            -o-transition: -o-transform 0.5s ease;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 12px;
+            padding: var(--spacing-unit);
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+        }
+
+        .carousel-slide h3 {
+            font-size: 1.2rem;
+            font-size: var(--section-title-size);
+            color: #e94560;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .carousel-controls {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .carousel-controls > * {
+            margin-left: 10px;
+        }
+
+        .carousel-controls > *:first-child {
+            margin-left: 0;
+        }
+
+        .carousel-indicators {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 12px;
+            padding: 6px var(--spacing-unit);
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            border-radius: 20px;
+        }
+
+        .carousel-indicators > * {
+            margin-right: 8px;
+        }
+
+        .carousel-indicators > *:last-child {
+            margin-right: 0;
+        }
+
+        .carousel-dot {
+            width: 40px;
+            height: 6px;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot:hover {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .carousel-dot.active {
+            background: #e94560;
+        }
+
+        .carousel-nav {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+            opacity: 0.9;
+            filter: alpha(opacity=90);
+        }
+
+        .carousel-nav:hover {
+            opacity: 1;
+            filter: alpha(opacity=100);
+            background: #e94560;
+            border-color: #e94560;
+            -webkit-transform: scale(1.1);
+            -moz-transform: scale(1.1);
+            -ms-transform: scale(1.1);
+            -o-transform: scale(1.1);
+            transform: scale(1.1);
+        }
+
+        .carousel-nav:active {
+            -webkit-transform: scale(0.95);
+            -moz-transform: scale(0.95);
+            -ms-transform: scale(0.95);
+            -o-transform: scale(0.95);
+            transform: scale(0.95);
+        }
+
+        .carousel-timer {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+        }
+
+        .carousel-timer > * {
+            margin-left: 5px;
+        }
+
+        .carousel-timer > *:first-child {
+            margin-left: 0;
+        }
+
+        .carousel-timer-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .carousel-timer-progress {
+            height: 100%;
+            background: #e94560;
+            background: -webkit-linear-gradient(left, #e94560, #00d9ff);
+            background: -moz-linear-gradient(left, #e94560, #00d9ff);
+            background: -o-linear-gradient(left, #e94560, #00d9ff);
+            background: linear-gradient(90deg, #e94560, #00d9ff);
+            -webkit-animation: timerProgress 8s linear infinite;
+            -moz-animation: timerProgress 8s linear infinite;
+            -o-animation: timerProgress 8s linear infinite;
+            animation: timerProgress 8s linear infinite;
+        }
+
+        @-webkit-keyframes timerProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @-moz-keyframes timerProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @-o-keyframes timerProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes timerProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* 輪播內的人數統計樣式 */
+        .carousel-slide .attendance-grid {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            margin-bottom: 12px;
+            margin-bottom: var(--spacing-unit);
+        }
+
+        .carousel-slide .attendance-grid > * {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            margin-right: 12px;
+            margin-right: var(--spacing-unit);
+        }
+
+        .carousel-slide .attendance-grid > *:last-child {
+            margin-right: 0;
+        }
+
+        .carousel-slide .attendance-item {
+            text-align: center;
+        }
+
+        .carousel-slide .attendance-item label {
+            display: block;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            color: #aaa;
+            margin-bottom: 6px;
+            margin-bottom: calc(var(--spacing-unit) * 0.5);
+        }
+
+        .carousel-slide .attendance-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            padding: var(--spacing-unit);
+            color: #fff;
+            font-size: 1.8rem;
+            font-size: var(--attendance-input-size);
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+
+        .carousel-slide .attendance-input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        .carousel-slide .attendance-input.expected {
+            border-color: rgba(0, 217, 255, 0.5);
+        }
+
+        .carousel-slide .attendance-input.actual {
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+
+        .carousel-slide .remarks-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            border-radius: var(--border-radius);
+            padding: 10px;
+            padding: calc(var(--spacing-unit) * 0.8);
+            color: #fff;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            width: 100%;
+            resize: none;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            min-height: 50px;
+        }
+
+        /* 輪播內的規則樣式 */
+        .carousel-slide .rules-content {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            overflow-y: auto;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            line-height: 1.8;
+        }
+
+        .carousel-slide .rules-list {
+            list-style: none;
+        }
+
+        .carousel-slide .rules-list li {
+            padding: 6px 0;
+            padding: calc(var(--spacing-unit) * 0.5) 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .carousel-slide .rules-list li::before {
+            content: "•";
+            color: #e94560;
+            position: absolute;
+            left: 4px;
+            font-size: 1.2rem;
+            font-size: var(--section-title-size);
+        }
+
+        .carousel-slide .rules-textarea {
+            width: 100%;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 6px;
+            -moz-border-radius: 6px;
+            border-radius: 6px;
+            padding: 12px;
+            padding: var(--spacing-unit);
+            color: #fff;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            line-height: 1.8;
+            resize: none;
+            display: none;
+        }
+
+        .carousel-slide .rules-textarea:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+
+        /* 雙擊編輯提示 - 已隱藏 */
+        .editable-hint {
+            display: none;
+        }
+
+        .carousel-slide .rules-content {
+            cursor: pointer;
+            -webkit-transition: background 0.2s ease;
+            -moz-transition: background 0.2s ease;
+            -o-transition: background 0.2s ease;
+            transition: background 0.2s ease;
+            padding: 8px;
+            padding: calc(var(--spacing-unit) * 0.7);
+            margin: -8px;
+            margin: calc(var(--spacing-unit) * -0.7);
+        }
+
+        .carousel-slide .rules-content:hover {
+            background: rgba(255, 255, 255, 0.05);
+            -webkit-border-radius: 6px;
+            -moz-border-radius: 6px;
+            border-radius: 6px;
+        }
+
+        /* 考試規則區 - 已整合至輪播 */
+
+        /* 底部控制區 */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 24px;
+            padding: calc(var(--spacing-unit) * 0.8) calc(var(--spacing-unit) * 2);
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-pack: justify;
+            -webkit-justify-content: space-between;
+            -moz-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+            -webkit-transition: opacity 0.3s ease;
+            -moz-transition: opacity 0.3s ease;
+            -o-transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer.hidden {
+            opacity: 0;
+            filter: alpha(opacity=0);
+            pointer-events: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        /* 顯示/隱藏控制列的切換按鈕 - 已移至頂部 */
+
+        .control-buttons {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .control-buttons > * {
+            margin-right: 12px;
+            margin-right: var(--spacing-unit);
+        }
+
+        .control-buttons > *:last-child {
+            margin-right: 0;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            padding: calc(var(--spacing-unit) * 0.8) calc(var(--spacing-unit) * 1.8);
+            border: none;
+            -webkit-border-radius: 6px;
+            -moz-border-radius: 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            font-weight: bold;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #00d9ff;
+            background: -webkit-linear-gradient(315deg, #00d9ff, #0099cc);
+            background: -moz-linear-gradient(315deg, #00d9ff, #0099cc);
+            background: -o-linear-gradient(315deg, #00d9ff, #0099cc);
+            background: linear-gradient(135deg, #00d9ff, #0099cc);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            -webkit-box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+            -moz-box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+            -webkit-transform: translateY(-2px);
+            -moz-transform: translateY(-2px);
+            -ms-transform: translateY(-2px);
+            -o-transform: translateY(-2px);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #4caf50;
+            background: -webkit-linear-gradient(315deg, #4caf50, #388e3c);
+            background: -moz-linear-gradient(315deg, #4caf50, #388e3c);
+            background: -o-linear-gradient(315deg, #4caf50, #388e3c);
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            -webkit-box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+            -moz-box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+            -webkit-transform: translateY(-2px);
+            -moz-transform: translateY(-2px);
+            -ms-transform: translateY(-2px);
+            -o-transform: translateY(-2px);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            background: -webkit-linear-gradient(315deg, #ff9800, #f57c00);
+            background: -moz-linear-gradient(315deg, #ff9800, #f57c00);
+            background: -o-linear-gradient(315deg, #ff9800, #f57c00);
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            -webkit-box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+            -moz-box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.5);
+            -webkit-transform: translateY(-2px);
+            -moz-transform: translateY(-2px);
+            -ms-transform: translateY(-2px);
+            -o-transform: translateY(-2px);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #f44336;
+            background: -webkit-linear-gradient(315deg, #f44336, #d32f2f);
+            background: -moz-linear-gradient(315deg, #f44336, #d32f2f);
+            background: -o-linear-gradient(315deg, #f44336, #d32f2f);
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            -webkit-box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+            -moz-box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+            -webkit-transform: translateY(-2px);
+            -moz-transform: translateY(-2px);
+            -ms-transform: translateY(-2px);
+            -o-transform: translateY(-2px);
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+        }
+
+        .status-indicator > * {
+            margin-right: 8px;
+        }
+
+        .status-indicator > *:last-child {
+            margin-right: 0;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            border-radius: 50%;
+            background: #4caf50;
+            -webkit-animation: pulse 2s infinite;
+            -moz-animation: pulse 2s infinite;
+            -o-animation: pulse 2s infinite;
+            animation: pulse 2s infinite;
+        }
+
+        @-webkit-keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; filter: alpha(opacity=50); }
+        }
+
+        @-moz-keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @-o-keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; filter: alpha(opacity=50); }
+        }
+
+        /* 縮放按鈕樣式 */
+        .zoom-controls {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            margin-left: 10px;
+        }
+
+        .zoom-btn {
+            width: 26px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            -webkit-transition: all 0.2s ease;
+            -moz-transition: all 0.2s ease;
+            -o-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+            margin: 0 2px;
+            line-height: 1;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(233, 69, 96, 0.8);
+            border-color: #e94560;
+            -webkit-transform: scale(1.1);
+            -moz-transform: scale(1.1);
+            -ms-transform: scale(1.1);
+            -o-transform: scale(1.1);
+            transform: scale(1.1);
+        }
+
+        .zoom-btn:active {
+            -webkit-transform: scale(0.95);
+            -moz-transform: scale(0.95);
+            -ms-transform: scale(0.95);
+            -o-transform: scale(0.95);
+            transform: scale(0.95);
+        }
+
+        .zoom-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-right: 5px;
+        }
+
+        .zoom-level {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 32px;
+            text-align: center;
+        }
+
+        /* 淺色模式 - 縮放按鈕 */
+        .light-mode .zoom-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #2d3748;
+        }
+
+        .light-mode .zoom-btn:hover {
+            background: rgba(233, 69, 96, 0.8);
+            border-color: #e94560;
+            color: #fff;
+        }
+
+        .light-mode .zoom-label {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .light-mode .zoom-level {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* 輪播標題列布局調整 */
+        .carousel-header {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            margin-bottom: 12px;
+            margin-bottom: var(--spacing-unit);
+            padding-bottom: 8px;
+            padding-bottom: calc(var(--spacing-unit) * 0.7);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .carousel-header h3 {
+            font-size: 1.2rem;
+            font-size: var(--section-title-size);
+            color: #e94560;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .carousel-header-spacer {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -moz-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+
+        .light-mode .carousel-header {
+            border-bottom-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .carousel-header h3 {
+            color: #c53050;
+        }
+
+        /* 移除舊的 carousel-slide h3 樣式中的 padding-right */
+        .carousel-slide h3.standalone-title {
+            font-size: 1.2rem;
+            font-size: var(--section-title-size);
+            color: #e94560;
+            margin-bottom: 12px;
+            margin-bottom: var(--spacing-unit);
+            padding-bottom: 8px;
+            padding-bottom: calc(var(--spacing-unit) * 0.7);
+            padding-right: 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 滾動條樣式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== 淺色模式 ===== */
+        body.light-mode {
+            background: #e8ecf1;
+            background: -webkit-linear-gradient(315deg, #e8ecf1 0%, #d1d9e6 50%, #c8d0dc 100%);
+            background: -moz-linear-gradient(315deg, #e8ecf1 0%, #d1d9e6 50%, #c8d0dc 100%);
+            background: -o-linear-gradient(315deg, #e8ecf1 0%, #d1d9e6 50%, #c8d0dc 100%);
+            background: linear-gradient(135deg, #e8ecf1 0%, #d1d9e6 50%, #c8d0dc 100%);
+            color: #2d3748;
+        }
+
+        /* 頂部標題區 - 淺色 */
+        .light-mode .header {
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom-color: #e94560;
+            -webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            -moz-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .header h1 {
+            color: #c53050;
+            text-shadow: none;
+        }
+
+        .light-mode .current-time {
+            color: #1a202c;
+            text-shadow: none;
+        }
+
+        .light-mode .current-date {
+            color: #4a5568;
+        }
+
+        /* 左側面板 - 淺色 */
+        .light-mode .schedule-panel {
+            background: rgba(255, 255, 255, 0.8);
+            -webkit-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            -moz-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .light-mode .panel-toggle {
+            background: rgba(233, 69, 96, 0.9);
+        }
+
+        .light-mode .collapsed-label {
+            color: #c53050;
+        }
+
+        .light-mode .schedule-header {
+            background: rgba(233, 69, 96, 0.15);
+            color: #2d3748;
+        }
+
+        .light-mode .schedule-item {
+            background: rgba(0, 0, 0, 0.03);
+            border-left-color: transparent;
+        }
+
+        .light-mode .schedule-item:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .light-mode .schedule-item.active {
+            background: rgba(0, 180, 216, 0.12);
+            border-left-color: #0096c7;
+            -webkit-box-shadow: 0 0 10px rgba(0, 150, 199, 0.2);
+            -moz-box-shadow: 0 0 10px rgba(0, 150, 199, 0.2);
+            box-shadow: 0 0 10px rgba(0, 150, 199, 0.2);
+        }
+
+        .light-mode .schedule-item.completed {
+            opacity: 0.6;
+            filter: alpha(opacity=60);
+            border-left-color: #38a169;
+        }
+
+        .light-mode .schedule-item.upcoming {
+            border-left-color: #d69e2e;
+        }
+
+        .light-mode .period-label {
+            color: #c53050;
+        }
+
+        .light-mode .subject-input {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #2d3748;
+        }
+
+        .light-mode .subject-input::-webkit-input-placeholder { color: #718096; }
+        .light-mode .subject-input:-moz-placeholder { color: #718096; }
+        .light-mode .subject-input::-moz-placeholder { color: #718096; }
+        .light-mode .subject-input:-ms-input-placeholder { color: #718096; }
+        .light-mode .subject-input::placeholder { color: #718096; }
+
+        .light-mode .subject-input:focus {
+            border-color: #0096c7;
+            -webkit-box-shadow: 0 0 5px rgba(0, 150, 199, 0.3);
+            -moz-box-shadow: 0 0 5px rgba(0, 150, 199, 0.3);
+            box-shadow: 0 0 5px rgba(0, 150, 199, 0.3);
+        }
+
+        .light-mode .subject-display {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #2d3748;
+        }
+
+        .light-mode .time-input {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #2d3748;
+            color-scheme: light;
+        }
+
+        .light-mode .time-input::-webkit-calendar-picker-indicator {
+            -webkit-filter: none;
+            filter: none;
+        }
+
+        .light-mode .time-input:focus {
+            border-color: #0096c7;
+        }
+
+        .light-mode .time-separator {
+            color: #4a5568;
+        }
+
+        .light-mode .duration-display {
+            color: #b7791f;
+        }
+
+        /* 右側面板 - 淺色 */
+        .light-mode .countdown-box {
+            background: rgba(255, 255, 255, 0.8);
+            -webkit-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            -moz-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .light-mode .countdown-box h3 {
+            color: #4a5568;
+        }
+
+        .light-mode .countdown-box.next-exam .countdown-value {
+            color: #b7791f;
+            text-shadow: none;
+        }
+
+        .light-mode .countdown-box.remaining .countdown-value {
+            color: #c53030;
+            text-shadow: none;
+        }
+
+        .light-mode .countdown-box.warning .countdown-value {
+            color: #c05621;
+        }
+
+        .light-mode .countdown-box.danger .countdown-value {
+            color: #c53030;
+        }
+
+        .light-mode .current-exam-info {
+            color: #0077b6;
+        }
+
+        /* 輪播區 - 淺色 */
+        .light-mode .carousel-container {
+            background: rgba(255, 255, 255, 0.8);
+            -webkit-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            -moz-box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .light-mode .carousel-slide h3 {
+            color: #c53050;
+            border-bottom-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .carousel-indicators {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .carousel-dot {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode .carousel-dot:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .light-mode .carousel-dot.active {
+            background: #e94560;
+        }
+
+        .light-mode .carousel-nav {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #2d3748;
+        }
+
+        .light-mode .carousel-nav:hover {
+            background: #e94560;
+            border-color: #e94560;
+            color: #fff;
+        }
+
+        .light-mode .carousel-timer-bar {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* 人數統計 - 淺色 */
+        .light-mode .carousel-slide .attendance-item label,
+        .light-mode .attendance-item label {
+            color: #4a5568;
+        }
+
+        .light-mode .carousel-slide .attendance-input,
+        .light-mode .attendance-input {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #2d3748;
+        }
+
+        .light-mode .carousel-slide .attendance-input:focus,
+        .light-mode .attendance-input:focus {
+            border-color: #0096c7;
+        }
+
+        .light-mode .carousel-slide .attendance-input.expected,
+        .light-mode .attendance-input.expected {
+            border-color: rgba(0, 150, 199, 0.5);
+        }
+
+        .light-mode .carousel-slide .attendance-input.actual,
+        .light-mode .attendance-input.actual {
+            border-color: rgba(56, 161, 105, 0.5);
+        }
+
+        .light-mode .carousel-slide .remarks-input,
+        .light-mode .remarks-input {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #2d3748;
+        }
+
+        .light-mode .carousel-slide .remarks-input:focus,
+        .light-mode .remarks-input:focus {
+            border-color: #0096c7;
+        }
+
+        .light-mode .carousel-slide .remarks-input::-webkit-input-placeholder { color: #718096; }
+        .light-mode .carousel-slide .remarks-input:-moz-placeholder { color: #718096; }
+        .light-mode .carousel-slide .remarks-input::-moz-placeholder { color: #718096; }
+        .light-mode .carousel-slide .remarks-input:-ms-input-placeholder { color: #718096; }
+        .light-mode .carousel-slide .remarks-input::placeholder { color: #718096; }
+
+        /* 規則區 - 淺色 */
+        .light-mode .carousel-slide .rules-content {
+            color: #2d3748;
+        }
+
+        .light-mode .carousel-slide .rules-content:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .light-mode .carousel-slide .rules-list li::before {
+            color: #c53050;
+        }
+
+        .light-mode .carousel-slide .rules-textarea {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.15);
+            color: #2d3748;
+        }
+
+        .light-mode .carousel-slide .rules-textarea:focus {
+            border-color: #0096c7;
+        }
+
+        /* 底部控制區 - 淺色 */
+        .light-mode .footer {
+            background: rgba(255, 255, 255, 0.7);
+            border-top-color: rgba(0, 0, 0, 0.1);
+            -webkit-box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            -moz-box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .light-mode .status-indicator {
+            color: #2d3748;
+        }
+
+        /* 按鈕 - 淺色模式微調 */
+        .light-mode .btn {
+            -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 主題切換按鈕樣式 */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            border-radius: 20px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            font-size: 1rem;
+            color: #fff;
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle > * {
+            margin-right: 6px;
+        }
+
+        .theme-toggle > *:last-child {
+            margin-right: 0;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            -webkit-transform: scale(1.05);
+            -moz-transform: scale(1.05);
+            -ms-transform: scale(1.05);
+            -o-transform: scale(1.05);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle .theme-icon {
+            font-size: 1.2rem;
+            -webkit-transition: -webkit-transform 0.3s ease;
+            -moz-transition: -moz-transform 0.3s ease;
+            -o-transition: -o-transform 0.3s ease;
+            transition: transform 0.3s ease;
+        }
+
+        .theme-toggle:hover .theme-icon {
+            -webkit-transform: rotate(20deg);
+            -moz-transform: rotate(20deg);
+            -ms-transform: rotate(20deg);
+            -o-transform: rotate(20deg);
+            transform: rotate(20deg);
+        }
+
+        .light-mode .theme-toggle {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.2);
+            color: #2d3748;
+        }
+
+        .light-mode .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* 滾動條 - 淺色 */
+        .light-mode ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .light-mode ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .light-mode ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 頂部標題區 -->
+    <header class="header">
+        <div>
+            <h1>📋 考試監控系統</h1>
+        </div>
+        <div style="text-align: center;">
+            <div class="current-time" id="currentTime">00:00:00</div>
+            <div class="current-date" id="currentDate">2026年1月19日 星期一</div>
+        </div>
+        <div style="text-align: right; display: -webkit-box; display: -webkit-flex; display: -moz-box; display: -ms-flexbox; display: flex; -webkit-box-align: center; -webkit-align-items: center; -moz-box-align: center; -ms-flex-align: center; align-items: center;">
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切換深色/淺色模式">
+                <span class="theme-icon" id="themeIcon">🌙</span>
+                <span id="themeText">深色</span>
+            </button>
+            <button class="btn btn-warning" id="toggleFooterBtn" onclick="toggleFooter()" title="隱藏/顯示控制面板" style="margin-left: 10px;">⚙️ 設定</button>
+            <button class="btn btn-primary" onclick="toggleFullscreen()" style="margin-left: 10px;">⛶ 全螢幕</button>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="main-container">
+        <!-- 左側：考試節次列表 -->
+        <section class="schedule-panel" id="schedulePanel">
+            <button class="panel-toggle" onclick="toggleSchedulePanel()" title="收納/展開考試科目欄">◀</button>
+            <span class="collapsed-label">📋 考試節次</span>
+            <div class="schedule-header">
+                <span>節次</span>
+                <span>考試科目</span>
+                <span>考試時間</span>
+                <span>時長</span>
+            </div>
+            <div class="schedule-list" id="scheduleList">
+                <!-- 動態生成 -->
+            </div>
+        </section>
+
+        <!-- 右側面板 -->
+        <aside class="right-panel">
+            <!-- 倒數計時區 -->
+            <div class="countdown-section">
+                <div class="countdown-box next-exam">
+                    <h3>📍 距離下一節考試</h3>
+                    <div class="countdown-value" id="nextExamCountdown">--:--:--</div>
+                    <div class="current-exam-info" id="nextExamInfo">尚未設定考試時間</div>
+                </div>
+                <div class="countdown-box remaining">
+                    <h3>⏱️ 本節剩餘時間</h3>
+                    <div class="countdown-value" id="remainingTime">--:--:--</div>
+                    <div class="current-exam-info" id="currentExamInfo">目前無進行中的考試</div>
+                </div>
+            </div>
+
+            <!-- 輪播區：人數統計 + 考試規則 -->
+            <div class="carousel-container" id="infoCarousel">
+                <div class="carousel-timer-bar">
+                    <div class="carousel-timer-progress" id="carouselProgress"></div>
+                </div>
+                
+                <div class="carousel-slides" id="carouselSlides">
+                    <!-- 第一頁：人數統計 -->
+                    <div class="carousel-slide" id="slide-attendance">
+                        <div class="carousel-header">
+                            <h3>👥 人數統計</h3>
+                            <div class="zoom-controls">
+                                <span class="zoom-label">備註</span>
+                                <button class="zoom-btn" onclick="zoomText('remarks', -1)" title="縮小備註文字">−</button>
+                                <span class="zoom-level" id="remarks-zoom-level">100%</span>
+                                <button class="zoom-btn" onclick="zoomText('remarks', 1)" title="放大備註文字">+</button>
+                            </div>
+                            <div class="carousel-header-spacer"></div>
+                            <div class="carousel-controls">
+                                <div class="carousel-indicators">
+                                    <div class="carousel-dot active" onclick="goToSlide(0)" title="人數統計"></div>
+                                    <div class="carousel-dot" onclick="goToSlide(1)" title="考試規則"></div>
+                                </div>
+                                <button class="carousel-nav prev" onclick="prevSlide()">❮</button>
+                                <button class="carousel-nav next" onclick="nextSlide()">❯</button>
+                            </div>
+                        </div>
+                        <div class="attendance-grid">
+                            <div class="attendance-item">
+                                <label>應到人數</label>
+                                <input type="number" class="attendance-input expected" id="expectedCount" value="0" min="0">
+                            </div>
+                            <div class="attendance-item">
+                                <label>實到人數</label>
+                                <input type="number" class="attendance-input actual" id="actualCount" value="0" min="0">
+                            </div>
+                            <div class="attendance-item">
+                                <label>缺席人數</label>
+                                <input type="number" class="attendance-input" id="absentCount" value="0" readonly style="background: rgba(244, 67, 54, 0.2); border-color: rgba(244, 67, 54, 0.5);">
+                            </div>
+                        </div>
+                        <textarea class="remarks-input" id="remarks" placeholder="備註事項（如：特殊情況、違規紀錄等）"></textarea>
+                    </div>
+                    
+                    <!-- 第二頁：考試規則 -->
+                    <div class="carousel-slide" id="slide-rules">
+                        <div class="carousel-header">
+                            <h3>📜 考試規則</h3>
+                            <div class="zoom-controls">
+                                <span class="zoom-label">規則</span>
+                                <button class="zoom-btn" onclick="zoomText('rules', -1)" title="縮小規則文字">−</button>
+                                <span class="zoom-level" id="rules-zoom-level">100%</span>
+                                <button class="zoom-btn" onclick="zoomText('rules', 1)" title="放大規則文字">+</button>
+                            </div>
+                            <div class="carousel-header-spacer"></div>
+                            <div class="carousel-controls">
+                                <div class="carousel-indicators">
+                                    <div class="carousel-dot" onclick="goToSlide(0)" title="人數統計"></div>
+                                    <div class="carousel-dot active" onclick="goToSlide(1)" title="考試規則"></div>
+                                </div>
+                                <button class="carousel-nav prev" onclick="prevSlide()">❮</button>
+                                <button class="carousel-nav next" onclick="nextSlide()">❯</button>
+                            </div>
+                        </div>
+                        <div class="rules-content" id="rulesContent" ondblclick="toggleRulesEdit()">
+                            <ul class="rules-list" id="rulesList">
+                                <li>考生應於預備鐘響時進入試場</li>
+                                <li>作答時不得交談、窺視他人答案</li>
+                                <li>考試時間不得交換文具、紙張</li>
+                                <li>違規者依校規處理，情節嚴重者該科以零分計算</li>
+                            </ul>
+                        </div>
+                        <textarea class="rules-textarea" id="rulesTextarea" onblur="saveRulesEdit()"></textarea>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- 底部控制區 -->
+    <footer class="footer">
+        <div class="control-buttons">
+            <button class="btn btn-success" onclick="saveData()">💾 儲存資料</button>
+            <button class="btn btn-warning" onclick="loadData()">📂 載入資料</button>
+            <button class="btn btn-danger" onclick="clearData()">🗑️ 清除資料</button>
+        </div>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>系統運行中</span>
+        </div>
+    </footer>
+
+    <script>
+        // 節次資料（含預設考試時間）
+        const periods = [
+            { id: 1, label: '第一節', defaultStart: '08:15', defaultEnd: '09:00' },
+            { id: 2, label: '第二節', defaultStart: '09:15', defaultEnd: '10:00' },
+            { id: 3, label: '第三節', defaultStart: '10:15', defaultEnd: '11:00' },
+            { id: 4, label: '第四節', defaultStart: '11:10', defaultEnd: '11:55' },
+            { id: 5, label: '第五節', defaultStart: '13:15', defaultEnd: '14:00' },
+            { id: 6, label: '第六節', defaultStart: '14:15', defaultEnd: '15:00' },
+            { id: 7, label: '第七節', defaultStart: '15:20', defaultEnd: '16:05' }
+        ];
+
+        // 初始化節次列表
+        function initScheduleList() {
+            const scheduleList = document.getElementById('scheduleList');
+            scheduleList.innerHTML = periods.map(period => `
+                <div class="schedule-item" id="period-${period.id}" data-period="${period.id}">
+                    <span class="period-label">${period.label}</span>
+                    <div class="subject-wrapper">
+                           <input type="text" class="subject-input" 
+                               id="subject-${period.id}" 
+                               placeholder="考試科目"
+                               oninput="saveToLocalStorage()"
+                               onchange="saveToLocalStorage()"
+                               onfocus="hideSubjectDisplay(${period.id})"
+                               onblur="updateSubjectDisplay(${period.id})">
+                        <div class="subject-display" id="subject-display-${period.id}" onclick="editSubject(${period.id})">
+                            <span class="marquee-text" id="marquee-${period.id}"></span>
+                        </div>
+                    </div>
+                    <div class="time-inputs">
+                        <input type="time" class="time-input" 
+                               id="start-${period.id}" 
+                               onchange="updateDuration(${period.id}); saveToLocalStorage()">
+                        <span class="time-separator">~</span>
+                        <input type="time" class="time-input" 
+                               id="end-${period.id}" 
+                               onchange="updateDuration(${period.id}); saveToLocalStorage()">
+                    </div>
+                    <span class="duration-display" id="duration-${period.id}">--分</span>
+                </div>
+            `).join('');
+        }
+
+        // 隱藏科目顯示區（進入編輯模式）
+        function hideSubjectDisplay(periodId) {
+            const display = document.getElementById(`subject-display-${periodId}`);
+            if (display) {
+                display.classList.remove('active');
+            }
+        }
+
+        // 更新科目顯示（跑馬燈）
+        function updateSubjectDisplay(periodId) {
+            const input = document.getElementById(`subject-${periodId}`);
+            const display = document.getElementById(`subject-display-${periodId}`);
+            const marquee = document.getElementById(`marquee-${periodId}`);
+
+            // 容錯檢查
+            if (!input || !display || !marquee) return;
+
+            const text = (input.value || '').trim();
+
+            // 除錯輸出，瀏覽器 console 可查看
+            console.debug('updateSubjectDisplay', periodId, text);
+
+            if (text) {
+                if (text.length > 6) {
+                    // 文字超過6個字，顯示跑馬燈
+                    marquee.textContent = text + '　　　　' + text + '　　　　';
+                    marquee.classList.add('animate');
+                } else {
+                    // 文字短，不需要跑馬燈，靜態顯示
+                    marquee.textContent = text;
+                    marquee.classList.remove('animate');
+                }
+
+                // 顯示 display 區塊，隱藏 input
+                display.classList.add('active');
+                input.classList.add('hidden');
+            } else {
+                // 沒有文字，顯示輸入框，隱藏 display
+                display.classList.remove('active');
+                marquee.textContent = '';
+                marquee.classList.remove('animate');
+                input.classList.remove('hidden');
+            }
+        }
+
+        // 點擊顯示區域進入編輯模式
+        function editSubject(periodId) {
+            const input = document.getElementById(`subject-${periodId}`);
+            const display = document.getElementById(`subject-display-${periodId}`);
+            if (!input || !display) return;
+
+            display.classList.remove('active');
+            input.classList.remove('hidden');
+            input.focus();
+            input.select();
+        }
+
+        // 計算並顯示考試時長
+        function updateDuration(periodId) {
+            const startInput = document.getElementById(`start-${periodId}`);
+            const endInput = document.getElementById(`end-${periodId}`);
+            const durationDisplay = document.getElementById(`duration-${periodId}`);
+            
+            if (startInput.value && endInput.value) {
+                const start = timeToMinutes(startInput.value);
+                const end = timeToMinutes(endInput.value);
+                const duration = end - start;
+                
+                if (duration > 0) {
+                    durationDisplay.textContent = `${duration}分鐘`;
+                } else {
+                    durationDisplay.textContent = '時間錯誤';
+                }
+            } else {
+                durationDisplay.textContent = '--分鐘';
+            }
+        }
+
+        // 時間轉分鐘
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        // 更新當前時間
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-TW', { hour12: false });
+            const dateStr = now.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            
+            document.getElementById('currentTime').textContent = timeStr;
+            document.getElementById('currentDate').textContent = dateStr;
+            
+            updateCountdowns(now);
+            updatePeriodStatus(now);
+        }
+
+        // 更新倒數計時
+        function updateCountdowns(now) {
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            const currentSeconds = now.getSeconds();
+            
+            let nextExam = null;
+            let currentExam = null;
+            
+            // 找出下一節考試和當前考試
+            for (const period of periods) {
+                const startInput = document.getElementById(`start-${period.id}`);
+                const endInput = document.getElementById(`end-${period.id}`);
+                const subjectInput = document.getElementById(`subject-${period.id}`);
+                
+                if (startInput.value && endInput.value) {
+                    const startMinutes = timeToMinutes(startInput.value);
+                    const endMinutes = timeToMinutes(endInput.value);
+                    const subjectName = subjectInput.value || '';
+                    
+                    // 檢查是否為當前考試
+                    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                        currentExam = {
+                            period: period,
+                            subject: subjectName || '未設定科目',
+                            endMinutes: endMinutes,
+                            isSelfStudy: isSelfStudySubject(subjectName)
+                        };
+                    }
+                    
+                    // 檢查是否為下一節考試（跳過自習類科目）
+                    if (startMinutes > currentMinutes && !nextExam && !isSelfStudySubject(subjectName)) {
+                        nextExam = {
+                            period: period,
+                            subject: subjectName || '未設定科目',
+                            startMinutes: startMinutes
+                        };
+                    }
+                }
+            }
+            
+            // 更新下一節考試倒數
+            const nextExamCountdown = document.getElementById('nextExamCountdown');
+            const nextExamInfo = document.getElementById('nextExamInfo');
+            const nextExamBox = nextExamCountdown.closest('.countdown-box');
+            
+            if (nextExam) {
+                const diffMinutes = nextExam.startMinutes - currentMinutes;
+                const diffSeconds = diffMinutes * 60 - currentSeconds;
+                nextExamCountdown.textContent = formatCountdown(diffSeconds);
+                nextExamInfo.textContent = `${nextExam.period.label}：${nextExam.subject}`;
+            } else {
+                nextExamCountdown.textContent = '--:--:--';
+                nextExamInfo.textContent = '今日考試已結束';
+            }
+            
+            // 更新本節剩餘時間
+            const remainingTime = document.getElementById('remainingTime');
+            const currentExamInfo = document.getElementById('currentExamInfo');
+            const remainingBox = remainingTime.closest('.countdown-box');
+            
+            remainingBox.classList.remove('warning', 'danger');
+            
+            if (currentExam) {
+                const diffMinutes = currentExam.endMinutes - currentMinutes;
+                const diffSeconds = diffMinutes * 60 - currentSeconds;
+                remainingTime.textContent = formatCountdown(diffSeconds);
+                currentExamInfo.textContent = `${currentExam.period.label}：${currentExam.subject}`;
+                
+                // 根據剩餘時間變更顏色
+                if (diffMinutes <= 5) {
+                    remainingBox.classList.add('danger');
+                } else if (diffMinutes <= 15) {
+                    remainingBox.classList.add('warning');
+                }
+            } else {
+                remainingTime.textContent = '--:--:--';
+                currentExamInfo.textContent = '目前無進行中的考試';
+            }
+        }
+
+        // 判斷是否為自習類科目（這些科目不計入考試倒數）
+        function isSelfStudySubject(subjectName) {
+            if (!subjectName) return false;
+            const name = subjectName.trim().toLowerCase();
+            // 自習相關關鍵字
+            const selfStudyKeywords = ['自習', '自修', '複習', '温習', '溫習', '休息', '空堂', '午休', '午餐', '早自習', '晚自習'];
+            return selfStudyKeywords.some(keyword => name.includes(keyword));
+        }
+
+        // 格式化倒數時間
+        function formatCountdown(totalSeconds) {
+            if (totalSeconds < 0) return '--:--:--';
+            
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // 更新節次狀態
+        function updatePeriodStatus(now) {
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            for (const period of periods) {
+                const periodElement = document.getElementById(`period-${period.id}`);
+                const startInput = document.getElementById(`start-${period.id}`);
+                const endInput = document.getElementById(`end-${period.id}`);
+                
+                periodElement.classList.remove('active', 'completed', 'upcoming');
+                
+                if (startInput.value && endInput.value) {
+                    const startMinutes = timeToMinutes(startInput.value);
+                    const endMinutes = timeToMinutes(endInput.value);
+                    
+                    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                        periodElement.classList.add('active');
+                    } else if (currentMinutes >= endMinutes) {
+                        periodElement.classList.add('completed');
+                    } else if (currentMinutes < startMinutes) {
+                        periodElement.classList.add('upcoming');
+                    }
+                }
+            }
+        }
+
+        // 計算缺席人數
+        function updateAbsentCount() {
+            const expected = parseInt(document.getElementById('expectedCount').value) || 0;
+            const actual = parseInt(document.getElementById('actualCount').value) || 0;
+            document.getElementById('absentCount').value = Math.max(0, expected - actual);
+        }
+
+        // 切換規則編輯模式（雙擊進入編輯）
+        function toggleRulesEdit() {
+            const rulesContent = document.getElementById('rulesContent');
+            const rulesList = document.getElementById('rulesList');
+            const rulesTextarea = document.getElementById('rulesTextarea');
+            
+            if (rulesTextarea.style.display === 'none' || rulesTextarea.style.display === '') {
+                // 進入編輯模式
+                const rules = Array.from(rulesList.querySelectorAll('li')).map(li => li.textContent);
+                rulesTextarea.value = rules.join('\n');
+                rulesContent.style.display = 'none';
+                rulesTextarea.style.display = 'block';
+                rulesTextarea.focus();
+                // 暫停輪播
+                clearInterval(carouselInterval);
+                document.getElementById('carouselProgress').style.animationPlayState = 'paused';
+            }
+        }
+
+        // 儲存規則編輯（失去焦點時自動儲存）
+        function saveRulesEdit() {
+            const rulesContent = document.getElementById('rulesContent');
+            const rulesList = document.getElementById('rulesList');
+            const rulesTextarea = document.getElementById('rulesTextarea');
+            
+            // 儲存並退出編輯模式
+            const rules = rulesTextarea.value.split('\n').filter(r => r.trim());
+            rulesList.innerHTML = rules.map(rule => `<li>${rule}</li>`).join('');
+            rulesTextarea.style.display = 'none';
+            rulesContent.style.display = 'block';
+            saveToLocalStorage();
+            // 恢復輪播
+            startCarouselTimer();
+            document.getElementById('carouselProgress').style.animationPlayState = 'running';
+        }
+
+        // 切換左側考試科目面板收納
+        function toggleSchedulePanel() {
+            const panel = document.getElementById('schedulePanel');
+            panel.classList.toggle('collapsed');
+            saveSchedulePanelState();
+        }
+
+        // 儲存面板狀態
+        function saveSchedulePanelState() {
+            const panel = document.getElementById('schedulePanel');
+            localStorage.setItem('schedulePanelCollapsed', panel.classList.contains('collapsed'));
+        }
+
+        // 載入面板狀態
+        function loadSchedulePanelState() {
+            const isCollapsed = localStorage.getItem('schedulePanelCollapsed') === 'true';
+            const panel = document.getElementById('schedulePanel');
+            if (isCollapsed) {
+                panel.classList.add('collapsed');
+            }
+        }
+
+        // 全螢幕切換
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // 切換底部控制列顯示/隱藏
+        function toggleFooter() {
+            const footer = document.querySelector('.footer');
+            const toggleBtn = document.getElementById('toggleFooterBtn');
+            
+            footer.classList.toggle('hidden');
+            
+            if (footer.classList.contains('hidden')) {
+                toggleBtn.innerHTML = '⚙️ 顯示控制列';
+                toggleBtn.title = '顯示控制面板';
+            } else {
+                toggleBtn.innerHTML = '⚙️ 隱藏控制列';
+                toggleBtn.title = '隱藏控制面板';
+            }
+            
+            // 儲存狀態
+            localStorage.setItem('footerHidden', footer.classList.contains('hidden'));
+        }
+
+        // 載入控制列顯示狀態
+        function loadFooterState() {
+            const isHidden = localStorage.getItem('footerHidden') === 'true';
+            const footer = document.querySelector('.footer');
+            const toggleBtn = document.getElementById('toggleFooterBtn');
+            
+            if (isHidden) {
+                footer.classList.add('hidden');
+                toggleBtn.innerHTML = '⚙️ 顯示控制列';
+                toggleBtn.title = '顯示控制面板';
+            } else {
+                toggleBtn.innerHTML = '⚙️ 隱藏控制列';
+                toggleBtn.title = '隱藏控制面板';
+            }
+        }
+
+        // 儲存資料到 localStorage
+        function saveToLocalStorage() {
+            const data = {
+                periods: periods.map(p => ({
+                    id: p.id,
+                    subject: document.getElementById(`subject-${p.id}`).value,
+                    startTime: document.getElementById(`start-${p.id}`).value,
+                    endTime: document.getElementById(`end-${p.id}`).value
+                })),
+                attendance: {
+                    expected: document.getElementById('expectedCount').value,
+                    actual: document.getElementById('actualCount').value,
+                    remarks: document.getElementById('remarks').value
+                },
+                rules: Array.from(document.getElementById('rulesList').querySelectorAll('li')).map(li => li.textContent)
+            };
+            
+            localStorage.setItem('examDashboardData', JSON.stringify(data));
+        }
+
+        // 從 localStorage 載入資料
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('examDashboardData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                // 載入節次資料
+                data.periods.forEach(p => {
+                    document.getElementById(`subject-${p.id}`).value = p.subject || '';
+                    document.getElementById(`start-${p.id}`).value = p.startTime || '';
+                    document.getElementById(`end-${p.id}`).value = p.endTime || '';
+                    updateDuration(p.id);
+                    updateSubjectDisplay(p.id);
+                });
+                
+                // 載入人數統計
+                if (data.attendance) {
+                    document.getElementById('expectedCount').value = data.attendance.expected || 0;
+                    document.getElementById('actualCount').value = data.attendance.actual || 0;
+                    document.getElementById('remarks').value = data.attendance.remarks || '';
+                    updateAbsentCount();
+                }
+                
+                // 載入考試規則
+                if (data.rules && data.rules.length > 0) {
+                    document.getElementById('rulesList').innerHTML = data.rules.map(rule => `<li>${rule}</li>`).join('');
+                }
+            } else {
+                // 沒有儲存資料時，使用預設考試時間
+                loadDefaultTimes();
+            }
+        }
+
+        // 載入預設考試時間
+        function loadDefaultTimes() {
+            periods.forEach(period => {
+                document.getElementById(`start-${period.id}`).value = period.defaultStart;
+                document.getElementById(`end-${period.id}`).value = period.defaultEnd;
+                updateDuration(period.id);
+            });
+        }
+
+        // 儲存資料（顯示提示）
+        function saveData() {
+            saveToLocalStorage();
+            alert('資料已儲存！');
+        }
+
+        // 載入資料
+        function loadData() {
+            if (confirm('確定要載入已儲存的資料嗎？目前的資料將被覆蓋。')) {
+                loadFromLocalStorage();
+                alert('資料已載入！');
+            }
+        }
+
+        // 清除資料
+        function clearData() {
+            if (confirm('確定要清除所有資料嗎？此操作無法復原。')) {
+                localStorage.removeItem('examDashboardData');
+                location.reload();
+            }
+        }
+
+        // 監聽人數輸入變化
+        document.getElementById('expectedCount').addEventListener('input', updateAbsentCount);
+        document.getElementById('actualCount').addEventListener('input', updateAbsentCount);
+
+        // 監聽人數和備註變化以儲存
+        document.getElementById('expectedCount').addEventListener('change', saveToLocalStorage);
+        document.getElementById('actualCount').addEventListener('change', saveToLocalStorage);
+        document.getElementById('remarks').addEventListener('change', saveToLocalStorage);
+
+        // 初始化
+        initScheduleList();
+        loadFromLocalStorage();
+        loadFooterState();
+        loadSchedulePanelState();
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+
+        // 鍵盤快捷鍵
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            // 左右鍵切換輪播
+            if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+            if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+
+        // 輪播功能
+        let currentSlide = 0;
+        const totalSlides = 2;
+        let carouselInterval;
+        const CAROUSEL_DELAY = 8000; // 8秒切換
+
+        function updateCarousel() {
+            const slides = document.getElementById('carouselSlides');
+            const dots = document.querySelectorAll('.carousel-dot');
+            const progress = document.getElementById('carouselProgress');
+            
+            slides.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+            
+            // 更新所有頁面的 carousel-dot 狀態
+            dots.forEach(function(dot, index) {
+                // 每個頁面有 2 個 dot，所以用 index % 2
+                dot.classList.toggle('active', (index % totalSlides) === currentSlide);
+            });
+            
+            // 重置進度條動畫
+            progress.style.animation = 'none';
+            progress.offsetHeight; // 強制重繪
+            progress.style.animation = 'timerProgress ' + (CAROUSEL_DELAY / 1000) + 's linear infinite';
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateCarousel();
+            resetCarouselTimer();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+            resetCarouselTimer();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+            resetCarouselTimer();
+        }
+
+        function startCarouselTimer() {
+            carouselInterval = setInterval(nextSlide, CAROUSEL_DELAY);
+        }
+
+        function resetCarouselTimer() {
+            clearInterval(carouselInterval);
+            startCarouselTimer();
+        }
+
+        // 滑鼠懸停時暫停輪播
+        document.getElementById('infoCarousel').addEventListener('mouseenter', function() {
+            clearInterval(carouselInterval);
+            document.getElementById('carouselProgress').style.animationPlayState = 'paused';
+        });
+
+        document.getElementById('infoCarousel').addEventListener('mouseleave', function() {
+            startCarouselTimer();
+            document.getElementById('carouselProgress').style.animationPlayState = 'running';
+        });
+
+        // 啟動輪播
+        startCarouselTimer();
+
+        // ===== 主題切換功能 =====
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            if (body.classList.contains('light-mode')) {
+                // 切換到深色模式
+                body.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = '深色';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                // 切換到淺色模式
+                body.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = '淺色';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // 載入主題設定
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeIcon.textContent = '☀️';
+                themeText.textContent = '淺色';
+            } else {
+                document.body.classList.remove('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = '深色';
+            }
+        }
+
+        // 初始化主題
+        loadTheme();
+
+        // ===== 文字縮放功能 =====
+        const zoomLevels = {
+            remarks: 100,
+            rules: 100
+        };
+        const ZOOM_MIN = 70;
+        const ZOOM_MAX = 150;
+        const ZOOM_STEP = 10;
+
+        function zoomText(target, direction) {
+            // 計算新的縮放比例
+            let newLevel = zoomLevels[target] + (direction * ZOOM_STEP);
+            newLevel = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newLevel));
+            zoomLevels[target] = newLevel;
+
+            // 更新顯示
+            document.getElementById(target + '-zoom-level').textContent = newLevel + '%';
+
+            // 應用縮放
+            if (target === 'remarks') {
+                const remarksInput = document.getElementById('remarks');
+                if (remarksInput) {
+                    remarksInput.style.fontSize = (newLevel / 100) + 'em';
+                }
+            } else if (target === 'rules') {
+                const rulesContent = document.getElementById('rulesContent');
+                const rulesTextarea = document.getElementById('rulesTextarea');
+                if (rulesContent) {
+                    rulesContent.style.fontSize = (newLevel / 100) + 'em';
+                }
+                if (rulesTextarea) {
+                    rulesTextarea.style.fontSize = (newLevel / 100) + 'em';
+                }
+            }
+
+            // 儲存設定
+            saveZoomSettings();
+        }
+
+        function saveZoomSettings() {
+            localStorage.setItem('zoomLevels', JSON.stringify(zoomLevels));
+        }
+
+        function loadZoomSettings() {
+            const saved = localStorage.getItem('zoomLevels');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.remarks) {
+                    zoomLevels.remarks = parsed.remarks;
+                    document.getElementById('remarks-zoom-level').textContent = parsed.remarks + '%';
+                    const remarksInput = document.getElementById('remarks');
+                    if (remarksInput) {
+                        remarksInput.style.fontSize = (parsed.remarks / 100) + 'em';
+                    }
+                }
+                if (parsed.rules) {
+                    zoomLevels.rules = parsed.rules;
+                    document.getElementById('rules-zoom-level').textContent = parsed.rules + '%';
+                    const rulesContent = document.getElementById('rulesContent');
+                    const rulesTextarea = document.getElementById('rulesTextarea');
+                    if (rulesContent) {
+                        rulesContent.style.fontSize = (parsed.rules / 100) + 'em';
+                    }
+                    if (rulesTextarea) {
+                        rulesTextarea.style.fontSize = (parsed.rules / 100) + 'em';
+                    }
+                }
+            }
+        }
+
+        // 初始化縮放設定
+        loadZoomSettings();
+    </script>
+</body>
+</html>
