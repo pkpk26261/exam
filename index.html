@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>考試監控系統</title>
+    
+    <!-- 網站圖示 Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%231a1a2e'/><stop offset='100%25' style='stop-color:%230f3460'/></linearGradient></defs><rect width='100' height='100' rx='15' fill='url(%23bg)'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%23e94560'>📋</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%231a1a2e'/><stop offset='100%25' style='stop-color:%230f3460'/></linearGradient></defs><rect width='100' height='100' rx='15' fill='url(%23bg)'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='%23e94560'>📋</text></svg>">
+    <!-- 備用：純文字 emoji favicon（相容性更好） -->
+    <link rel="alternate icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+    
+    <!-- PWA 相關設定 -->
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="考試監控">
+    
     <style>
         :root {
             --base-font-size: 14px;
@@ -611,9 +624,18 @@
         }
 
         .time-input::-webkit-calendar-picker-indicator {
-            -webkit-filter: invert(1);
-            filter: invert(1);
-            cursor: pointer;
+            display: none;
+            -webkit-appearance: none;
+            opacity: 0;
+            width: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .time-input::-webkit-inner-spin-button,
+        .time-input::-webkit-clear-button {
+            display: none;
+            -webkit-appearance: none;
         }
 
         .time-input:focus {
@@ -2476,7 +2498,7 @@
                                 <li>作答時不得交談、窺視他人答案</li>
                                 <li>考試時間不得交換文具、紙張</li>
                                 <li>違規者依校規處理，情節嚴重者該科以零分計算</li>
-                                <li>寫完考卷時，請至少詳細檢查一次！</li>
+                                <li>寫完考卷時，請至少詳細檢查一次</li>
                             </ul>
                         </div>
                         <textarea class="rules-textarea" id="rulesTextarea" onblur="saveRulesEdit()"></textarea>
