@@ -353,6 +353,7 @@
             -ms-flex: 1;
             flex: 1;
             overflow-y: auto;
+            scroll-behavior: smooth;
             display: -webkit-box;
             display: -webkit-flex;
             display: -moz-box;
@@ -444,6 +445,67 @@
 
         .schedule-item.upcoming {
             border-left-color: #ffc107;
+        }
+
+        /* 早自習時段樣式 */
+        .schedule-item.morning-period {
+            background: rgba(255, 193, 7, 0.1);
+            border-left-color: #ffc107;
+        }
+
+        .schedule-item.morning-period .period-label {
+            color: #ffc107;
+        }
+
+        .schedule-item.morning-period.active {
+            background: rgba(255, 193, 7, 0.2);
+            -webkit-box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+            -moz-box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+        }
+
+        /* 午休時段樣式 */
+        .schedule-item.lunch-period {
+            background: rgba(156, 39, 176, 0.1);
+            border-left-color: #9c27b0;
+        }
+
+        .schedule-item.lunch-period .period-label {
+            color: #9c27b0;
+        }
+
+        .schedule-item.lunch-period.active {
+            background: rgba(156, 39, 176, 0.2);
+            -webkit-box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+            -moz-box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+            box-shadow: 0 0 15px rgba(156, 39, 176, 0.3);
+        }
+
+        /* 非考試時段標籤 */
+        .non-exam-label {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            -moz-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .non-exam-text {
+            font-size: 1rem;
+            font-size: var(--normal-text-size);
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
         }
 
         .period-label {
@@ -2981,14 +3043,17 @@
         }
 
         // 節次資料（含預設考試時間）
+        // type: 'exam' 為考試節次, 'morning' 為早自習, 'lunch' 為午休
         var periods = [
-            { id: 1, label: '第一節', defaultStart: '08:15', defaultEnd: '09:00' },
-            { id: 2, label: '第二節', defaultStart: '09:15', defaultEnd: '10:00' },
-            { id: 3, label: '第三節', defaultStart: '10:15', defaultEnd: '11:00' },
-            { id: 4, label: '第四節', defaultStart: '11:10', defaultEnd: '11:55' },
-            { id: 5, label: '第五節', defaultStart: '13:15', defaultEnd: '14:00' },
-            { id: 6, label: '第六節', defaultStart: '14:15', defaultEnd: '15:00' },
-            { id: 7, label: '第七節', defaultStart: '15:20', defaultEnd: '16:05' }
+            { id: 'morning', label: '早自習', defaultStart: '07:30', defaultEnd: '08:00', type: 'morning' },
+            { id: 1, label: '第一節', defaultStart: '08:15', defaultEnd: '09:00', type: 'exam' },
+            { id: 2, label: '第二節', defaultStart: '09:15', defaultEnd: '10:00', type: 'exam' },
+            { id: 3, label: '第三節', defaultStart: '10:15', defaultEnd: '11:00', type: 'exam' },
+            { id: 4, label: '第四節', defaultStart: '11:10', defaultEnd: '11:55', type: 'exam' },
+            { id: 'lunch', label: '午休', defaultStart: '12:40', defaultEnd: '13:05', type: 'lunch' },
+            { id: 5, label: '第五節', defaultStart: '13:15', defaultEnd: '14:00', type: 'exam' },
+            { id: 6, label: '第六節', defaultStart: '14:15', defaultEnd: '15:00', type: 'exam' },
+            { id: 7, label: '第七節', defaultStart: '15:20', defaultEnd: '16:05', type: 'exam' }
         ];
 
         // 初始化節次列表
@@ -2997,31 +3062,50 @@
             var html = '';
             for (var i = 0; i < periods.length; i++) {
                 var period = periods[i];
-                html += '<div class="schedule-item" id="period-' + period.id + '" data-period="' + period.id + '">' +
-                    '<span class="period-label">' + period.label + '</span>' +
-                    '<div class="subject-wrapper">' +
+                var periodIdStr = String(period.id);
+                var isExam = period.type === 'exam';
+                var isMorning = period.type === 'morning';
+                var isLunch = period.type === 'lunch';
+                var itemClass = 'schedule-item';
+                if (isMorning) itemClass += ' morning-period';
+                if (isLunch) itemClass += ' lunch-period';
+                
+                html += '<div class="' + itemClass + '" id="period-' + periodIdStr + '" data-period="' + periodIdStr + '" data-type="' + period.type + '">';
+                html += '<span class="period-label">' + period.label + '</span>';
+                
+                if (isExam) {
+                    // 考試節次：顯示科目輸入欄
+                    html += '<div class="subject-wrapper">' +
                         '<input type="text" class="subject-input" ' +
-                            'id="subject-' + period.id + '" ' +
+                            'id="subject-' + periodIdStr + '" ' +
                             'placeholder="考試科目" ' +
                             'oninput="saveToLocalStorage()" ' +
                             'onchange="saveToLocalStorage()" ' +
-                            'onfocus="hideSubjectDisplay(' + period.id + ')" ' +
-                            'onblur="updateSubjectDisplay(' + period.id + ')">' +
-                        '<div class="subject-display" id="subject-display-' + period.id + '" onclick="editSubject(' + period.id + ')">' +
-                            '<span class="marquee-text" id="marquee-' + period.id + '"></span>' +
+                            'onfocus="hideSubjectDisplay(\'' + periodIdStr + '\')" ' +
+                            'onblur="updateSubjectDisplay(\'' + periodIdStr + '\')">' +
+                        '<div class="subject-display" id="subject-display-' + periodIdStr + '" onclick="editSubject(\'' + periodIdStr + '\')">' +
+                            '<span class="marquee-text" id="marquee-' + periodIdStr + '"></span>' +
                         '</div>' +
-                    '</div>' +
-                    '<div class="time-inputs">' +
-                        '<input type="time" class="time-input" ' +
-                            'id="start-' + period.id + '" ' +
-                            'onchange="updateDuration(' + period.id + '); saveToLocalStorage()">' +
-                        '<span class="time-separator">~</span>' +
-                        '<input type="time" class="time-input" ' +
-                            'id="end-' + period.id + '" ' +
-                            'onchange="updateDuration(' + period.id + '); saveToLocalStorage()">' +
-                    '</div>' +
-                    '<span class="duration-display" id="duration-' + period.id + '">--分</span>' +
+                    '</div>';
+                } else if (isMorning) {
+                    // 早自習：顯示固定文字
+                    html += '<div class="non-exam-label"><span class="non-exam-text">📖 早自習時間</span></div>';
+                } else if (isLunch) {
+                    // 午休：顯示固定文字
+                    html += '<div class="non-exam-label"><span class="non-exam-text">😴 午休時間</span></div>';
+                }
+                
+                html += '<div class="time-inputs">' +
+                    '<input type="time" class="time-input" ' +
+                        'id="start-' + periodIdStr + '" ' +
+                        'onchange="updateDuration(\'' + periodIdStr + '\'); saveToLocalStorage()">' +
+                    '<span class="time-separator">~</span>' +
+                    '<input type="time" class="time-input" ' +
+                        'id="end-' + periodIdStr + '" ' +
+                        'onchange="updateDuration(\'' + periodIdStr + '\'); saveToLocalStorage()">' +
                 '</div>';
+                html += '<span class="duration-display" id="duration-' + periodIdStr + '">--分</span>';
+                html += '</div>';
             }
             scheduleList.innerHTML = html;
         }
@@ -3222,19 +3306,22 @@
                 var endInput = document.getElementById('end-' + period.id);
                 var subjectInput = document.getElementById('subject-' + period.id);
                 
-                if (startInput.value && endInput.value) {
+                if (startInput && startInput.value && endInput && endInput.value) {
                     var startMinutes = timeToMinutes(startInput.value);
                     var endMinutes = timeToMinutes(endInput.value);
-                    var subjectName = subjectInput.value || '';
+                    var subjectName = subjectInput ? subjectInput.value : '';
+                    
+                    // 判斷是否為非考試時段（早自習或午休）
+                    var isNonExamPeriod = period.type === 'morning' || period.type === 'lunch';
                     
                     // 檢查是否為當前節次
                     if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                         currentExam = {
                             period: period,
-                            subject: subjectName || '未設定科目',
+                            subject: isNonExamPeriod ? period.label : (subjectName || '未設定科目'),
                             endMinutes: endMinutes,
                             startMinutes: startMinutes,
-                            isSelfStudy: isSelfStudySubject(subjectName)
+                            isSelfStudy: isNonExamPeriod || isSelfStudySubject(subjectName)
                         };
                     }
                     
@@ -3242,14 +3329,14 @@
                     if (startMinutes > currentMinutes && !nextPeriod) {
                         nextPeriod = {
                             period: period,
-                            subject: subjectName || '未設定科目',
+                            subject: isNonExamPeriod ? period.label : (subjectName || '未設定科目'),
                             startMinutes: startMinutes,
-                            isSelfStudy: isSelfStudySubject(subjectName)
+                            isSelfStudy: isNonExamPeriod || isSelfStudySubject(subjectName)
                         };
                     }
                     
-                    // 檢查是否為下一節考試（跳過自習類科目）
-                    if (startMinutes > currentMinutes && !nextExam && !isSelfStudySubject(subjectName)) {
+                    // 檢查是否為下一節考試（跳過自習類科目和非考試時段）
+                    if (startMinutes > currentMinutes && !nextExam && !isNonExamPeriod && !isSelfStudySubject(subjectName)) {
                         nextExam = {
                             period: period,
                             subject: subjectName || '未設定科目',
@@ -3257,9 +3344,9 @@
                         };
                     }
                     
-                    // 檢查是否剛結束考試（非自習類）
+                    // 檢查是否剛結束考試（非自習類，非早自習午休）
                     // 在結束時間的第一秒觸發提醒
-                    if (currentMinutes === endMinutes && currentSeconds === 0 && !isSelfStudySubject(subjectName)) {
+                    if (currentMinutes === endMinutes && currentSeconds === 0 && !isNonExamPeriod && !isSelfStudySubject(subjectName)) {
                         var examKey = period.id + '-' + endMinutes;
                         if (examEndShownFor !== examKey) {
                             examEndShownFor = examKey;
@@ -3283,13 +3370,37 @@
             
             // 判斷顯示邏輯
             if (currentExam && currentExam.isSelfStudy) {
-                // 當節是自習/複習，隱藏「本節剩餘時間」，只顯示「距離下一節考試」
-                remainingBox.style.display = 'none';
-                nextExamBox.style.display = 'block';
-                nextExamBox.style.flex = '1';
-                nextExamBox.style.width = '100%';
-                nextExamBox.style.marginRight = '0';
+                // 當節是自習/早自習/午休，根據類型顯示不同內容
+                var isMorningPeriod = currentExam.period.type === 'morning';
+                var isLunchPeriod = currentExam.period.type === 'lunch';
                 
+                // 顯示兩個區塊：當前時段剩餘時間 + 距離下一節考試
+                nextExamBox.style.display = 'block';
+                remainingBox.style.display = 'block';
+                nextExamBox.style.flex = '1';
+                remainingBox.style.flex = '1';
+                nextExamBox.style.width = '';
+                remainingBox.style.width = '';
+                nextExamBox.style.marginRight = '';
+                remainingBox.style.marginRight = '0';
+                
+                // 更新當前時段剩餘時間
+                var diffSeconds2 = currentExam.endMinutes * 60 - currentTotalSeconds;
+                remainingTime.textContent = formatCountdown(diffSeconds2);
+                
+                if (isMorningPeriod) {
+                    remainingTitle.textContent = '📖 早自習剩餘時間';
+                    currentExamInfo.textContent = '請把握時間複習';
+                } else if (isLunchPeriod) {
+                    remainingTitle.textContent = '😴 午休剩餘時間';
+                    currentExamInfo.textContent = '請好好休息';
+                } else {
+                    remainingTitle.textContent = '📚 自習剩餘時間';
+                    currentExamInfo.textContent = currentExam.period.label + '：' + currentExam.subject;
+                }
+                currentExamInfo.classList.add('multiline');
+                
+                // 更新距離下一節考試
                 if (nextExam) {
                     var diffSeconds = nextExam.startMinutes * 60 - currentTotalSeconds;
                     nextExamCountdown.textContent = formatCountdown(diffSeconds);
@@ -3370,13 +3481,27 @@
                 }
                 
                 // 更新「下課時間倒數」（減掉3分鐘預備鐘時間）
-                remainingTitle.textContent = '☕ 下課時間倒數';
+                // 判斷是否為用餐時間（第四節結束到午休開始）
+                var isLunchBreak = nextPeriod && nextPeriod.period.type === 'lunch';
+                
+                if (isLunchBreak) {
+                    remainingTitle.textContent = '🍱 用餐時間倒數';
+                } else {
+                    remainingTitle.textContent = '☕ 下課時間倒數';
+                }
+                
                 if (nextPeriod) {
                     // 下課時間 = 距離下一節開始的時間 - 3分鐘預備鐘時間
-                    var breakTimeSeconds = nextPeriod.startMinutes * 60 - currentTotalSeconds - 180;
+                    // 用餐時間不扣除預備鐘時間
+                    var prepBellTime = isLunchBreak ? 0 : 180;
+                    var breakTimeSeconds = nextPeriod.startMinutes * 60 - currentTotalSeconds - prepBellTime;
                     if (breakTimeSeconds > 0) {
                         remainingTime.textContent = formatCountdown(breakTimeSeconds);
-                        currentExamInfo.textContent = '距離預備鐘響起';
+                        if (isLunchBreak) {
+                            currentExamInfo.textContent = '請把握時間用餐';
+                        } else {
+                            currentExamInfo.textContent = '距離預備鐘響起';
+                        }
                         currentExamInfo.classList.add('multiline');
                         
                         // 下課時間剩餘不到1分鐘時變色提醒
@@ -3431,6 +3556,8 @@
         // 更新節次狀態
         function updatePeriodStatus(now) {
             var currentMinutes = now.getHours() * 60 + now.getMinutes();
+            var activePeriodId = null;
+            var nextUpcomingPeriodId = null;
             
             for (var i = 0; i < periods.length; i++) {
                 var period = periods[i];
@@ -3446,12 +3573,50 @@
                     
                     if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                         periodElement.classList.add('active');
+                        activePeriodId = period.id;
                     } else if (currentMinutes >= endMinutes) {
                         periodElement.classList.add('completed');
                     } else if (currentMinutes < startMinutes) {
                         periodElement.classList.add('upcoming');
+                        // 記錄第一個即將到來的節次
+                        if (nextUpcomingPeriodId === null) {
+                            nextUpcomingPeriodId = period.id;
+                        }
                     }
                 }
+            }
+            
+            // 自動滾動到當前或即將進行的節次
+            scrollToCurrentPeriod(activePeriodId, nextUpcomingPeriodId);
+        }
+
+        // 追蹤上次滾動的節次，避免重複滾動
+        var lastScrolledPeriodId = null;
+
+        // 自動滾動到當前或即將進行的節次
+        function scrollToCurrentPeriod(activePeriodId, nextUpcomingPeriodId) {
+            var targetPeriodId = activePeriodId || nextUpcomingPeriodId;
+            
+            // 如果沒有目標節次，或與上次相同，不進行滾動
+            if (!targetPeriodId || targetPeriodId === lastScrolledPeriodId) {
+                return;
+            }
+            
+            var scheduleList = document.getElementById('scheduleList');
+            var targetElement = document.getElementById('period-' + targetPeriodId);
+            
+            if (scheduleList && targetElement) {
+                // 計算滾動位置，讓目標節次顯示在列表上方 1/3 處
+                var listRect = scheduleList.getBoundingClientRect();
+                var targetRect = targetElement.getBoundingClientRect();
+                var scrollOffset = targetElement.offsetTop - scheduleList.offsetTop - (listRect.height / 4);
+                
+                scheduleList.scrollTo({
+                    top: Math.max(0, scrollOffset),
+                    behavior: 'smooth'
+                });
+                
+                lastScrolledPeriodId = targetPeriodId;
             }
         }
 
@@ -3577,12 +3742,18 @@
             var periodsData = [];
             for (var i = 0; i < periods.length; i++) {
                 var p = periods[i];
-                periodsData.push({
+                var periodData = {
                     id: p.id,
-                    subject: document.getElementById('subject-' + p.id).value,
+                    type: p.type,
                     startTime: document.getElementById('start-' + p.id).value,
                     endTime: document.getElementById('end-' + p.id).value
-                });
+                };
+                // 只有考試節次有科目欄位
+                if (p.type === 'exam') {
+                    var subjectInput = document.getElementById('subject-' + p.id);
+                    periodData.subject = subjectInput ? subjectInput.value : '';
+                }
+                periodsData.push(periodData);
             }
             var rulesLiElements = document.getElementById('rulesList').querySelectorAll('li');
             var rulesData = [];
@@ -3604,18 +3775,32 @@
 
         // 從 localStorage 載入資料
         function loadFromLocalStorage() {
+            // 先載入預設時間，確保所有節次都有時間
+            loadDefaultTimes();
+            
             var savedData = localStorage.getItem('examDashboardData');
             if (savedData) {
                 var data = JSON.parse(savedData);
                 
-                // 載入節次資料
+                // 載入節次資料（覆蓋預設時間）
                 for (var i = 0; i < data.periods.length; i++) {
                     var p = data.periods[i];
-                    document.getElementById('subject-' + p.id).value = p.subject || '';
-                    document.getElementById('start-' + p.id).value = p.startTime || '';
-                    document.getElementById('end-' + p.id).value = p.endTime || '';
+                    var startEl = document.getElementById('start-' + p.id);
+                    var endEl = document.getElementById('end-' + p.id);
+                    
+                    // 只有找到對應元素才載入
+                    if (startEl && p.startTime) startEl.value = p.startTime;
+                    if (endEl && p.endTime) endEl.value = p.endTime;
                     updateDuration(p.id);
-                    updateSubjectDisplay(p.id);
+                    
+                    // 只有考試節次有科目欄位
+                    if (p.type === 'exam' || (!p.type && typeof p.id === 'number')) {
+                        var subjectEl = document.getElementById('subject-' + p.id);
+                        if (subjectEl) {
+                            subjectEl.value = p.subject || '';
+                            updateSubjectDisplay(p.id);
+                        }
+                    }
                 }
                 
                 // 載入人數統計
@@ -3634,9 +3819,6 @@
                     }
                     document.getElementById('rulesList').innerHTML = rulesHtml;
                 }
-            } else {
-                // 沒有儲存資料時，使用預設考試時間
-                loadDefaultTimes();
             }
         }
 
@@ -3689,6 +3871,14 @@
         updateTimeOffsetDisplay();
         updateCurrentTime();
         setInterval(updateCurrentTime, 1000);
+
+        // 頁面載入後延遲執行初始滾動（確保 DOM 完全渲染）
+        setTimeout(function() {
+            lastScrolledPeriodId = null; // 重設滾動追蹤，確保初始滾動會執行
+            var now = new Date();
+            now.setSeconds(now.getSeconds() + timeOffsetSeconds);
+            updatePeriodStatus(now);
+        }, 500);
 
         // 鍵盤快捷鍵
         document.addEventListener('keydown', function(e) {
