@@ -27,7 +27,7 @@
             --section-title-size: 1.2rem;
             --normal-text-size: 1rem;
             --small-text-size: 0.9rem;
-            --countdown-info-size: 1.5rem;
+            --countdown-info-size: 1.8rem;
             --input-text-size: 1rem;
             --attendance-input-size: 1.8rem;
             --spacing-unit: 12px;
@@ -45,7 +45,7 @@
                 --section-title-size: clamp(1rem, 1.4vw, 1.4rem);
                 --normal-text-size: clamp(0.85rem, 1.1vw, 1.1rem);
                 --small-text-size: clamp(0.75rem, 1vw, 1rem);
-                --countdown-info-size: clamp(1.1rem, 2vw, 2rem);
+                --countdown-info-size: clamp(1.3rem, 2.5vw, 2.5rem);
                 --input-text-size: clamp(0.9rem, 1.1vw, 1.1rem);
                 --attendance-input-size: clamp(1.4rem, 2.2vw, 2.2rem);
                 --spacing-unit: clamp(8px, 1vw, 15px);
@@ -786,6 +786,24 @@
             padding: 12px;
             padding: var(--spacing-unit);
             text-align: center;
+            min-height: 140px;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            -moz-box-orient: vertical;
+            -moz-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            -moz-box-pack: center;
+            -ms-flex-pack: center;
+            justify-content: center;
         }
 
         .countdown-box h3 {
@@ -874,8 +892,8 @@
         }
 
         .current-exam-info.multiline {
-            font-size: 1rem;
-            font-size: calc(var(--countdown-info-size) * 0.7);
+            font-size: 1.2rem;
+            font-size: calc(var(--countdown-info-size) * 0.8);
         }
 
         /* 人數統計區 */
@@ -2776,7 +2794,7 @@
                 <span id="themeText">深色</span>
             </button>
             <button class="btn btn-warning" id="toggleFooterBtn" onclick="toggleFooter()" title="隱藏/顯示控制面板" style="margin-left: 10px;">⚙️ 設定</button>
-            <button class="btn btn-primary" onclick="toggleFullscreen()" style="margin-left: 10px;">⛶ 全螢幕</button>
+            <button class="btn btn-primary" id="fullscreenBtn" onclick="toggleFullscreen()" title="切換全螢幕模式" style="margin-left: 10px;">⛶ 全螢幕</button>
         </div>
     </header>
 
@@ -3695,12 +3713,29 @@
 
         // 全螢幕切換
         function toggleFullscreen() {
+            var btn = document.getElementById('fullscreenBtn');
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
+                btn.innerHTML = '✖ 結束全螢幕';
+                btn.title = '退出全螢幕模式';
             } else {
                 document.exitFullscreen();
+                btn.innerHTML = '⛶ 全螢幕';
+                btn.title = '切換全螢幕模式';
             }
         }
+
+        // 監聽全螢幕狀態變化（處理 ESC 鍵退出等情況）
+        document.addEventListener('fullscreenchange', function() {
+            var btn = document.getElementById('fullscreenBtn');
+            if (document.fullscreenElement) {
+                btn.innerHTML = '✖ 結束全螢幕';
+                btn.title = '退出全螢幕模式';
+            } else {
+                btn.innerHTML = '⛶ 全螢幕';
+                btn.title = '切換全螢幕模式';
+            }
+        });
 
         // 切換底部控制列顯示/隱藏
         function toggleFooter() {
